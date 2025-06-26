@@ -1,13 +1,15 @@
 import httpx
 from starlette import status
 
-from cli.schema import HonulabsBusiness
+from cli.schema import HonulabsBusiness, HonulabsJob
 from cli.settings import Settings
 
 
 class HonulabsAPIClient:
 
-    def __init__(self, token: str):
+    def __init__(self, token: str | None):
+        if token is None:
+            raise Exception('Please login with a valid token first')
         self.token = token
 
     @property
@@ -29,3 +31,15 @@ class HonulabsAPIClient:
         if response.status_code != status.HTTP_201_CREATED:
             raise Exception(f'Could not create business: {response.text}')
         return HonulabsBusiness(**response.json())
+
+    def delete_business(self, business_id: str) -> HonulabsJob:
+        response = self.client.delete(f'/v1/businesses/{business_id}')
+        if response.status_code != status.HTTP_202_ACCEPTED:
+            raise Exception(f'Could not delete business: {response.text}')
+        return HonulabsJob(**response.json())
+
+    def get_job(self, business_id: str, job_id: str) -> HonulabsJob:
+        response = self.client.get(f'/v1/businesses/{business_id}/jobs/{job_id}')
+        if response.status_code != status.HTTP_200_OK:
+            raise Exception(f'Could not read job: {response.text}')
+        return HonulabsJob(**response.json())

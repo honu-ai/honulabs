@@ -12,6 +12,8 @@ from typing import Callable, Dict, Optional
 from tabulate import tabulate
 
 from cli.api_client import HonulabsAPIClient
+from cli.utils.job_manager import JobManager
+from cli.utils.pick_business import pick_business
 from cli.utils.token import HonulabsToken
 
 # Storage for registered commands
@@ -188,7 +190,21 @@ def create_business(*name: str):
 
 @command(help_text='Delete Business')
 def delete_business():
-    ...
+    token = HonulabsToken()
+    api_client = HonulabsAPIClient(token.token)
+    business_id = pick_business(TABLE_STYLE)
+    if business_id is None:
+        return
+
+    # Set up the job to delete the business
+    job = api_client.delete_business(business_id)
+    print('Deletion job started successfully. Awaiting completion. Skip wait with Ctrl+C.')
+    manager = JobManager(job)
+    try:
+        manager.await_job_completion()
+    except (KeyboardInterrupt, EOFError):
+        manager.spinner.stop()
+        print('Skipping wait for job completion. Job will continue running in the background')
 
 
 @command(help_text='Begin generation of Business Plan')
