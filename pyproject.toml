@@ -4,10 +4,17 @@ version = "0.1.0"
 description = "Honulabs CLI"
 authors = ["freyamade <freya.broderick@honu.ai>"]
 readme = "README.md"
+packages = [
+    { include = 'cli' },
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-
+pydantic = "^2.11.7"
+httpx = "^0.28.1"
+halo = "^0.0.31"
+pydantic-settings = "^2.10.1"
+fastapi = "^0.115.13"
 
 [build-system]
 requires = ["poetry-core"]
