@@ -5,8 +5,6 @@ from typing import Any
 
 from pydantic import BaseModel, Field, model_validator
 
-from common.identity.schema.api import UserSession
-
 
 # Core objects
 class JobStatus(str, Enum):
@@ -19,12 +17,6 @@ class JobStatus(str, Enum):
 class HonulabsOrganisation(BaseModel):
     org_id: str
     domain_id: str
-
-
-class HonulabsSession(BaseModel):
-    token: str
-    user: UserSession
-    org: HonulabsOrganisation
 
 
 class HonulabsBusiness(BaseModel):

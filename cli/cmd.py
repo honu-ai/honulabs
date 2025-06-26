@@ -9,6 +9,8 @@ import cmd
 import inspect
 from typing import Callable, Dict, Optional
 
+from tabulate import tabulate
+
 from cli.api_client import HonulabsAPIClient
 from cli.utils.token import HonulabsToken
 
@@ -16,6 +18,7 @@ from cli.utils.token import HonulabsToken
 _COMMANDS: Dict[str, Callable] = {}
 NOT_LOGGED_IN_HEADER = " -- User is not logged in \U0001F611 --"
 LOGGED_IN_HEADER = ' -- User is logged in \U0001F642 --'
+TABLE_STYLE = 'double_grid'
 
 def command(name: Optional[str] = None, help_text: str = ""):
     """Decorator to register a function as a CLI command."""
@@ -160,12 +163,27 @@ def login(token: str):
 
 @command(help_text='List your Businesses')
 def list_businesses():
-    ...
+    token = HonulabsToken()
+    api_client = HonulabsAPIClient(token.token)
+    businesses = api_client.list_businesses()
+    if not businesses:
+        print('You have no businesses yet!')
+        return
+
+    print(tabulate(
+        ({'id': biz.business_id, 'name': biz.name} for biz in businesses),
+        headers='keys',
+        tablefmt=TABLE_STYLE,
+    ))
 
 
 @command(help_text='Create new Business record')
-def create_business(name: str):
-    ...
+def create_business(*name: str):
+    token = HonulabsToken()
+    api_client = HonulabsAPIClient(token.token)
+    name = ' '.join(name)
+    biz = api_client.create_business(name)
+    print(f'Business record "{biz.name}" created!')
 
 
 @command(help_text='Delete Business')
