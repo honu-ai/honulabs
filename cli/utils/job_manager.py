@@ -1,3 +1,5 @@
+from asyncio import sleep
+
 from halo import Halo
 
 from cli.api_client import HonulabsAPIClient
@@ -40,6 +42,7 @@ class JobManager:
             except:
                 break
             self.spinner.text = self._message
+            sleep(1)
 
         # Check the finished status
         self.spinner.stop()

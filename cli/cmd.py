@@ -12,6 +12,7 @@ from typing import Callable, Dict, Optional
 from tabulate import tabulate
 
 from cli.api_client import HonulabsAPIClient
+from cli.utils.handle_business_generation import handle_business_generation
 from cli.utils.job_manager import JobManager
 from cli.utils.pick_business import pick_business
 from cli.utils.token import HonulabsToken
@@ -35,7 +36,7 @@ class HonulabsCommandPrompt(cmd.Cmd):
     """Interactive CLI that executes decorated functions."""
 
     intro = "Welcome to the Honulabs CLI. Type 'help' or '?' for help, 'exit' to quit."
-    prompt = "🐢 > "
+    prompt = "\n🐢 > "
 
     def __init__(self):
         super().__init__()
@@ -135,7 +136,7 @@ class HonulabsCommandPrompt(cmd.Cmd):
                 sig = inspect.signature(func)
                 params = []
                 for param in sig.parameters.values():
-                    if param.default == inspect.Parameter.empty:
+                    if pHTTP_202_ACCEPTEDaram.default == inspect.Parameter.empty:
                         params.append(f"<{param.name}>")
                     else:
                         params.append(f"[{param.name}]")
@@ -204,12 +205,15 @@ def delete_business():
         manager.await_job_completion()
     except (KeyboardInterrupt, EOFError):
         manager.spinner.stop()
-        print('Skipping wait for job completion. Job will continue running in the background')
+        print(f'Skipping wait for job completion. Job will continue running in the background, with id {job.job_id}')
 
 
 @command(help_text='Begin generation of Business Plan')
 def generate_business_plan():
-    ...
+    business_id = pick_business(TABLE_STYLE)
+    if business_id is None:
+        return
+    handle_business_generation(business_id)
 
 
 @command(help_text='Deploy latest landing page for Business')

@@ -416,7 +416,7 @@ class HonulabsBusinessCreate(BaseModel):
 class BusinessPlanRequirementsCreate(BaseModel):
     idea: str = Field(
         ...,
-        description='Detailed description of the idea for your new Saas product.',
+        description='Detailed description of the idea for your new Saas product:',
     )
     inspiration: str = Field(
         ...,
