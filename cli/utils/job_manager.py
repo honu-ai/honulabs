@@ -1,4 +1,4 @@
-from asyncio import sleep
+from time import sleep
 
 from halo import Halo
 

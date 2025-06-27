@@ -1,7 +1,8 @@
 import httpx
 from starlette import status
 
-from cli.schema import HonulabsBusiness, HonulabsJob, JobStatus, BusinessPlanRequirementsCreate
+from cli.schema import HonulabsBusiness, HonulabsJob, JobStatus, BusinessPlanRequirementsCreate, \
+    BusinessPlanRequirements
 from cli.settings import Settings
 
 
@@ -33,7 +34,15 @@ class HonulabsAPIClient:
             job_status: JobStatus | None = None,
     ) -> list[HonulabsJob]:
         # Return a list of jobs, optionally filtered by type and status
-        return []
+        response = self.client.get(f'/v1/businesses/{business_id}/jobs')
+        if response.status_code != status.HTTP_200_OK:
+            raise Exception(f'Could not retrieve jobs: {response.text}')
+        jobs = (HonulabsJob(**j) for j in response.json())
+        if job_type is not None:
+            jobs = filter(lambda job: job.job_type == job_type, jobs)
+        if job_status is not None:
+            jobs = filter(lambda job: job.status == job_status, jobs)
+        return list(jobs)
 
     def list_businesses(self) -> list[HonulabsBusiness]:
         response = self.client.get('/v1/businesses')
@@ -58,6 +67,24 @@ class HonulabsAPIClient:
             f'/v1/businesses/{business_id}/jobs/business_plan_requirements',
             json=payload.model_dump(),
         )
-        if response.status_code != status.HTTP_201_CREATED:
+        if response.status_code != status.HTTP_202_ACCEPTED:
             raise Exception(f'Could not start business plan requirements generation: {response.text}')
+        return HonulabsJob(**response.json())
+
+    def generate_base_business_plan(self, business_id: str, payload: BusinessPlanRequirements) -> HonulabsJob:
+        response = self.client.post(
+            f'/v1/businesses/{business_id}/jobs/base_business_plan',
+            json=payload.model_dump(),
+        )
+        if response.status_code != status.HTTP_202_ACCEPTED:
+            raise Exception(f'Could not start base business plan generation: {response.text}')
+        return HonulabsJob(**response.json())
+
+    def generate_business_name_ideas(self, business_id: str, payload: BusinessPlanRequirements) -> HonulabsJob:
+        response = self.client.post(
+            f'/v1/businesses/{business_id}/jobs/business_names_and_domains',
+            json=payload.model_dump(),
+        )
+        if response.status_code != status.HTTP_202_ACCEPTED:
+            raise Exception(f'Could not start business name ideas generation: {response.text}')
         return HonulabsJob(**response.json())

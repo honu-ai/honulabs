@@ -12,7 +12,7 @@ from typing import Callable, Dict, Optional
 from tabulate import tabulate
 
 from cli.api_client import HonulabsAPIClient
-from cli.utils.handle_business_generation import handle_business_generation
+from cli.utils.handle_business_generation import BusinessPlanGeneration
 from cli.utils.job_manager import JobManager
 from cli.utils.pick_business import pick_business
 from cli.utils.token import HonulabsToken
@@ -127,27 +127,27 @@ class HonulabsCommandPrompt(cmd.Cmd):
         """List available commands or show help for a specific command."""
         print("\nAvailable commands:")
         commands = sorted(list(_COMMANDS.keys()) + ["exit", "quit", "help"])
-        for command in commands:
-            if command in _COMMANDS:
-                func = _COMMANDS[command]
+        for cmd_name in commands:
+            if cmd_name in _COMMANDS:
+                func = _COMMANDS[cmd_name]
                 help_text = getattr(func, "_help_text", "")
 
                 # Get a simplified signature for overview
                 sig = inspect.signature(func)
                 params = []
                 for param in sig.parameters.values():
-                    if pHTTP_202_ACCEPTEDaram.default == inspect.Parameter.empty:
+                    if param.default == inspect.Parameter.empty:
                         params.append(f"<{param.name}>")
                     else:
                         params.append(f"[{param.name}]")
 
                 param_str = " ".join(params)
-                print(f"  {command} {param_str}")
+                print(f"  {cmd_name} {param_str}")
                 print(f"    {help_text}\n")
-            elif command in ("exit", "quit"):
-                print(f"  {command}")
+            elif cmd_name in ("exit", "quit"):
+                print(f"  {cmd_name}")
                 print("    Exit the CLI\n")
-            elif command == "help":
+            elif cmd_name == "help":
                 print("  help")
                 print("    List commands\n")
 
@@ -213,7 +213,8 @@ def generate_business_plan():
     business_id = pick_business(TABLE_STYLE)
     if business_id is None:
         return
-    handle_business_generation(business_id)
+    generator = BusinessPlanGeneration(business_id, TABLE_STYLE)
+    generator.run()
 
 
 @command(help_text='Deploy latest landing page for Business')
