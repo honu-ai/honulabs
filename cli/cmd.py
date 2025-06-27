@@ -12,6 +12,7 @@ from typing import Callable, Dict, Optional
 from tabulate import tabulate
 
 from cli.api_client import HonulabsAPIClient
+from cli.schema import JobStatus
 from cli.utils.handle_business_generation import BusinessPlanGeneration
 from cli.utils.job_manager import JobManager
 from cli.utils.pick_business import pick_business
@@ -225,3 +226,25 @@ def deploy_landing_page():
 @command(help_text='Upload secret variables for your app')
 def upload_secrets():
     ...
+
+
+@command(help_text='Check on the status of any Jobs that are currently in progress')
+def pending_jobs():
+    business_id = pick_business(TABLE_STYLE)
+    if business_id is None:
+        return
+    token = HonulabsToken()
+    api_client = HonulabsAPIClient(token.token)
+    pending_jobs = api_client.get_jobs(business_id, job_status=JobStatus.IN_PROGRESS)
+    if not pending_jobs:
+        print('No pending jobs!')
+        return
+
+    print(tabulate(
+        (
+            {'Type': job.job_type, 'Started At': job.started_at.isoformat(), 'Message': job.message or 'None!'}
+            for job in pending_jobs
+        ),
+        'keys',
+        TABLE_STYLE,
+    ))
