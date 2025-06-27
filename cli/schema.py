@@ -249,170 +249,6 @@ class BusinessNamesDomains(BaseModel):
         return self
 
 
-class Brand(BaseModel):
-    """
-    Model for brand.
-    """
-    populated_brand_framework: str
-    brand_summary: str
-    font_style: str
-    tone_of_voice: str
-    brand_colors: str
-
-    @model_validator(mode='after')
-    def check_fields(self):
-        """
-        Validate that the populated_brand_framework and brand_summary
-        fields contain more than 50 characters.
-        """
-        if self.populated_brand_framework is None or len(self.populated_brand_framework) < 50:
-            raise ValueError("populated_brand_framework must contain more than 50 characters.")
-        if self.brand_summary is None or len(self.brand_summary) < 50:
-            raise ValueError("brand_summary must contain more than 50 characters.")
-        return self
-
-
-class BusinessBrandComponents(BaseModel):
-    business_name: str
-    business_domain: str
-    business_brand: Brand
-    business_logo: str
-
-
-class WebsiteComponents(BaseModel):
-    landing_page_json: str
-    privacy_policy: str
-    terms_of_service: str
-
-
-class PrivacyPolicyVariables(BaseModel):
-    """
-    Model for privacy policy input variables.
-    """
-    company_legal_name: str = Field(...,
-                                    description="The legal name of the company. Use 'PLACEHOLDER_COMPANY_LEGAL_NAME' if cannot be determined.")
-    company_website_url: str = Field(...,
-                                     description="The URL of the company's website. Use 'PLACEHOLDER_COMPANY_WEBSITE_URL' if cannot be determined.")
-    company_name: str = Field(...,
-                              description="The name of the company. Use 'PLACEHOLDER_COMPANY_NAME' if cannot be determined.")
-    company_service_description: str = Field(...,
-                                             description="A brief description of the services provided by the company. Use 'PLACEHOLDER_COMPANY_SERVICE_DESCRIPTION' if cannot be determined.")
-    company_contact_email: str = Field(...,
-                                       description="The contact email for the company. Use 'PLACEHOLDER_COMPANY_CONTACT_EMAIL' if cannot be determined.")
-    ai_product_functions: str = Field(...,
-                                      description="A brief description of the functions of the AI product. Use 'PLACEHOLDER_AI_PRODUCT_FUNCTIONS' if cannot be determined.")
-    company_registered_address: str = Field(...,
-                                            description="The registered address of the company. Use 'PLACEHOLDER_COMPANY_REGISTERED_ADDRESS' if cannot be determined.")
-
-
-class TermsOfServiceVariables(BaseModel):
-    """
-    Model for terms of service input variables.
-    """
-    company_legal_name: str = Field(...,
-                                    description="The legal name of the company. Use 'PLACEHOLDER_COMPANY_LEGAL_NAME' if cannot be determined.")
-    country_of_company_registration: str = Field(...,
-                                                 description="The country where the company is registered. Use 'PLACEHOLDER_COUNTRY_OF_COMPANY_REGISTRATION' if cannot be determined.")
-    company_registration_address: str = Field(...,
-                                              description="The registered address of the company. Use 'PLACEHOLDER_COMPANY_REGISTRATION_ADDRESS' if cannot be determined.")
-    website_url: str = Field(...,
-                             description="The URL of the company's website. Use 'PLACEHOLDER_WEBSITE_URL' if cannot be determined.")
-    company_service_description: str = Field(...,
-                                             description="A brief description of the services provided by the company. Use 'PLACEHOLDER_COMPANY_SERVICE_DESCRIPTION' if cannot be determined.")
-    contact_email: str = Field(...,
-                               description="The contact email for the company. Use 'PLACEHOLDER_CONTACT_EMAIL' if cannot be determined.")
-    trial_period: str = Field(...,
-                              description="The duration of the trial period offered by the company. Use 'PLACEHOLDER_TRIAL_PERIOD' if cannot be determined.")
-    privacy_policy: str = Field(...,
-                                description="The URL of the company's privacy policy. Use 'PLACEHOLDER_PRIVACY_POLICY' if cannot be determined.")
-
-
-class IndividualSprintPlan(BaseModel):
-    sprint_plan: str
-
-
-class SprintPlanCollection(BaseModel):
-    individual_sprints: list[IndividualSprintPlan]
-
-
-class StrategyPricingPlan(BaseModel):
-    """ Model for individual pricing plans """
-    name: str
-    description: str
-    unit_amount: float
-    currency: str
-    recurring_interval: str | None = Field(default=None)
-    recurring_trial_period_days: str | None = Field(default=None)
-    metadata: dict
-
-
-class StrategyPricingPlanCollection(BaseModel):
-    pricing_plans: list[StrategyPricingPlan]
-
-
-class UserPersona(BaseModel):
-    user_persona: str
-
-
-class JobsToBeDone(BaseModel):
-    """
-    Model for jobs to be done.
-    """
-    jtbd: str
-
-
-class UserJourneyMapping(BaseModel):
-    """
-    Model for user journey mapping.
-    """
-    user_journey_map: str
-
-
-class UserJourneyFlow(BaseModel):
-    """
-    Model for user journey flow.
-    """
-    user_journey_flow: str
-
-
-class MVPFramework(BaseModel):
-    """
-    Model for MVP framework.
-    """
-    mvp: str
-
-
-class ProductIntegration(BaseModel):
-    service: str
-    purpose: str
-    manual_steps: list[str]
-    programmatic_steps: list[str]
-
-
-class ProductIntegrations(BaseModel):
-    """
-    Model for product integrations.
-    """
-    integrations: list[ProductIntegration]
-
-
-class BusinessSpecifications(BaseModel):
-    project_name: str
-    project_domain: str
-    landing_page_content: dict
-    privacy_policy: str
-    terms_of_service: str
-    sprint_plans: list[str]
-    github_repo_url: str | None
-    supabase_project_id: str | None
-    vercel_project_id: str | None
-
-
-# Post Payloads
-class HonulabsBusinessCreate(BaseModel):
-    name: str
-
-
 class BusinessPlanRequirementsCreate(BaseModel):
     idea: str = Field(
         ...,
@@ -437,19 +273,17 @@ class BusinessPlanRequirementsCreate(BaseModel):
 
     @property
     def q_n_a(self) -> str:
-        return dedent(f"""
-        - {self.model_fields["inspiration"].description}
-        {self.inspiration}
+        return dedent(f"""- {self.model_fields["inspiration"].description}
+{self.inspiration}
 
-        - {self.model_fields["long_term_goals"].description}
-        {self.long_term_goals}
+- {self.model_fields["long_term_goals"].description}
+{self.long_term_goals}
 
-        - {self.model_fields["brand_interpretation"].description}
-        {self.brand_interpretation}
+- {self.model_fields["brand_interpretation"].description}
+{self.brand_interpretation}
 
-        - {self.model_fields["risk_assessment"].description}
-        {self.risk_assessment}
-        """.strip())
+- {self.model_fields["risk_assessment"].description}
+{self.risk_assessment}""".strip())
 
 
 class FullBusinessDetailsCreate(BaseModel):

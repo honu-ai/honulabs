@@ -2,7 +2,7 @@ import httpx
 from starlette import status
 
 from cli.schema import HonulabsBusiness, HonulabsJob, JobStatus, BusinessPlanRequirementsCreate, \
-    BusinessPlanRequirements, VercelSecrets
+    BusinessPlanRequirements, VercelSecrets, BusinessPlan, FullBusinessDetailsCreate
 from cli.settings import Settings
 
 
@@ -87,6 +87,19 @@ class HonulabsAPIClient:
         )
         if response.status_code != status.HTTP_202_ACCEPTED:
             raise Exception(f'Could not start business name ideas generation: {response.text}')
+        return HonulabsJob(**response.json())
+
+    def generate_full_business_plan(self, business_id: str, business_plan: BusinessPlan, business_name: str) -> HonulabsJob:
+        payload = FullBusinessDetailsCreate(
+            business_name=business_name,
+            base_business_plan=business_plan,
+        )
+        response = self.client.post(
+            f'/v1/businesses/{business_id}/jobs/full_business_details',
+            json=payload.model_dump(),
+        )
+        if response.status_code != status.HTTP_202_ACCEPTED:
+            raise Exception(f'Could not start full details generation: {response.text}')
         return HonulabsJob(**response.json())
 
     def deploy_landing_page(self, business_id: str) -> HonulabsJob:
