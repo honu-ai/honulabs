@@ -2,7 +2,7 @@ import httpx
 from starlette import status
 
 from cli.schema import HonulabsBusiness, HonulabsJob, JobStatus, BusinessPlanRequirementsCreate, \
-    BusinessPlanRequirements
+    BusinessPlanRequirements, VercelSecrets
 from cli.settings import Settings
 
 
@@ -87,4 +87,19 @@ class HonulabsAPIClient:
         )
         if response.status_code != status.HTTP_202_ACCEPTED:
             raise Exception(f'Could not start business name ideas generation: {response.text}')
+        return HonulabsJob(**response.json())
+
+    def deploy_landing_page(self, business_id: str) -> HonulabsJob:
+        response = self.client.post(f'/v1/businesses/{business_id}/jobs/deploy_page')
+        if response.status_code != status.HTTP_202_ACCEPTED:
+            raise Exception(f'Could not start deployment job: {response.text}')
+        return HonulabsJob(**response.json())
+
+    def deploy_secrets_to_vercel(self, business_id: str, payload: VercelSecrets) -> HonulabsJob:
+        response = self.client.post(
+            f'/v1/businesses/{business_id}/jobs/deploy_vercel_environment_variables',
+            json=payload.model_dump(),
+        )
+        if response.status_code != status.HTTP_202_ACCEPTED:
+            raise Exception(f'Could not start secret variable upload: {response.text}')
         return HonulabsJob(**response.json())

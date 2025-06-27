@@ -12,7 +12,7 @@ from typing import Callable, Dict, Optional
 from tabulate import tabulate
 
 from cli.api_client import HonulabsAPIClient
-from cli.schema import JobStatus
+from cli.schema import JobStatus, VercelSecrets
 from cli.utils.handle_business_generation import BusinessPlanGeneration
 from cli.utils.job_manager import JobManager
 from cli.utils.pick_business import pick_business
@@ -220,12 +220,68 @@ def generate_business_plan():
 
 @command(help_text='Deploy latest landing page for Business')
 def deploy_landing_page():
-    ...
+    token = HonulabsToken()
+    api_client = HonulabsAPIClient(token.token)
+    business_id = pick_business(TABLE_STYLE)
+    if business_id is None:
+        return
+
+    # Set up the job
+    job = api_client.deploy_landing_page(business_id)
+    print('Deployment job started successfully. Awaiting completion. Skip wait with Ctrl+C.')
+    manager = JobManager(job)
+    try:
+        manager.await_job_completion()
+    except (KeyboardInterrupt, EOFError):
+        manager.spinner.stop()
+        print(f'Skipping wait for job completion. Job will continue running in the background, with id {job.job_id}')
 
 
 @command(help_text='Upload secret variables for your app')
 def upload_secrets():
-    ...
+    token = HonulabsToken()
+    api_client = HonulabsAPIClient(token.token)
+    business_id = pick_business(TABLE_STYLE)
+    if business_id is None:
+        return
+
+    secrets = {}
+    print('Input secret names and values. Leaving any input blank will continue to the upload portion.')
+    while True:
+        secret_name = input('Secret Name: ').strip()
+        if secret_name == '':
+            break
+        secret_value = input('Secret Value: ').strip()
+        if secret_value == '':
+            break
+        secrets[secret_name] = secret_value
+
+    if not secrets:
+        print('Not uploading any secrets!')
+        return
+
+    print()
+    print(tabulate(
+        ({'Name': k, 'Value': v} for k, v in secrets.items()),
+        'keys',
+        TABLE_STYLE,
+    ))
+    print()
+    print('Please double check that all variables are correct.')
+    proceed = input('Upload these variables? [y/n]').lower().strip().startswith('y')
+    if not proceed:
+        print('Exiting')
+        return
+
+        # Set up the job
+    job = api_client.deploy_secrets_to_vercel(business_id, VercelSecrets(secrets=secrets))
+    print('Deployment job started successfully. Awaiting completion. Skip wait with Ctrl+C.')
+    manager = JobManager(job)
+    try:
+        manager.await_job_completion()
+    except (KeyboardInterrupt, EOFError):
+        manager.spinner.stop()
+        print(f'Skipping wait for job completion. Job will continue running in the background, with id {job.job_id}')
 
 
 @command(help_text='Check on the status of any Jobs that are currently in progress')
@@ -242,7 +298,7 @@ def pending_jobs():
 
     print(tabulate(
         (
-            {'Type': job.job_type, 'Started At': job.started_at.isoformat(), 'Message': job.message or 'None!'}
+            {'ID': job.job_id, 'Type': job.job_type, 'Started At': job.started_at.isoformat(), 'Message': job.message or 'None!'}
             for job in pending_jobs
         ),
         'keys',
