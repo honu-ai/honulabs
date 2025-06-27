@@ -296,11 +296,32 @@ def pending_jobs():
         print('No pending jobs!')
         return
 
+    data = {
+        str(num): job
+        for num, job in enumerate(pending_jobs, start=1)
+    }
     print(tabulate(
         (
-            {'ID': job.job_id, 'Type': job.job_type, 'Started At': job.started_at.isoformat(), 'Message': job.message or 'None!'}
-            for job in pending_jobs
+            {'Number': num, 'ID': job.job_id, 'Type': job.job_type, 'Started At': job.started_at.isoformat(),
+             'Message': job.message or 'None!'}
+            for num, job in data.items()
         ),
         'keys',
         TABLE_STYLE,
     ))
+    try:
+        print('Here are you pending jobs! If you would like to wait for one to complete, please type the number, or just press ENTER to return to the menu.')
+        selected_num = input('> ').strip()
+        if selected_num == '':
+            return
+
+        while selected_num not in data:
+            print('That number is not a valid choice, please select a valid choice or press ENTER to cancel.')
+            selected_num = input('> ').strip()
+            if selected_num == '':
+                return
+
+        manager = JobManager(data[selected_num])
+        manager.await_job_completion()
+    except (KeyboardInterrupt, EOFError):
+        return
