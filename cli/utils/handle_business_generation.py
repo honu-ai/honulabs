@@ -40,16 +40,22 @@ class BusinessPlanGeneration:
         print()
         self._generate_full_business_plan(base_business_plan, business_name)
 
-    def _verify_result(self, result: BaseModel) -> bool:
+    def _verify_result(self, result: BaseModel, html: bool = False) -> bool:
+        extension = 'html' if html else 'md'
         with TemporaryDirectory(ignore_cleanup_errors=True) as dir_path:
             for name in result.model_fields:
-                file_name = f'{dir_path}/{name}.md'
+                file_name = f'{dir_path}/{name}.{extension}'
                 value = getattr(result, name)
-                lines = [f'# {name}']
+                lines = []
+
+                if not html:
+                    lines.append(f'# {name}')
+
                 if isinstance(value, BaseModel):
                     # Iterate through fields and write them all out to the file
                     for sub_name in value.model_fields:
-                        lines.append(f'## {sub_name}')
+                        if not html:
+                            lines.append(f'## {sub_name}')
                         lines.append(getattr(value, sub_name))
                     lines.append('')
                 else:
@@ -146,7 +152,7 @@ class BusinessPlanGeneration:
             return
 
         plan = BusinessPlan(**job.result)
-        if self._verify_result(plan):
+        if self._verify_result(plan, True):
             return plan
         return None
 
