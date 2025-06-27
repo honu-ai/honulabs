@@ -310,7 +310,6 @@ def pending_jobs():
         TABLE_STYLE,
     ))
     try:
-        print('Here are your pending jobs!')
         print('If you would like to wait for one to complete, please type the number, or just press ENTER to return to the menu.')
         selected_num = input('> ').strip()
         if selected_num == '':
