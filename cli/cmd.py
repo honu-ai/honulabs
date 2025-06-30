@@ -24,6 +24,7 @@ NOT_LOGGED_IN_HEADER = " -- User is not logged in \U0001F611 --"
 LOGGED_IN_HEADER = ' -- User is logged in \U0001F642 --'
 TABLE_STYLE = 'double_grid'
 
+
 def command(name: Optional[str] = None, help_text: str = ""):
     """Decorator to register a function as a CLI command."""
     def decorator(func: Callable) -> Callable:

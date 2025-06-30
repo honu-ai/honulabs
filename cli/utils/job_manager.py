@@ -7,6 +7,21 @@ from cli.schema import HonulabsJob, JobStatus
 from cli.utils.token import HonulabsToken
 
 
+LOADING_BAR = {
+    "interval": 160,
+    "frames": [
+        "(       )",
+        "(     🐢)",
+        "(    🐢 )",
+        "(   🐢  )",
+        "(  🐢   )",
+        "( 🐢    )",
+        "(🐢     )",
+        "(       )",
+    ],
+}
+
+
 class JobManager:
     FINISHED_STATES = {JobStatus.SUCCESS, JobStatus.FAILED}
 
@@ -32,7 +47,7 @@ class JobManager:
 
     def await_job_completion(self) -> HonulabsJob:
         # Loop requests to the API, give status message from the Job while it's still running
-        self.spinner = Halo(text=self._message, spinner='dots')
+        self.spinner = Halo(text=self._message, spinner=LOADING_BAR)
         self.spinner.start()
 
         # Send an api request to fetch the job status
