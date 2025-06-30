@@ -2,6 +2,6 @@ from pydantic_settings import BaseSettings
 
 
 class _Settings(BaseSettings):
-    API_URL: str = 'http://localhost:8092'
+    API_URL: str = 'https://honulabs-api.honu.ai'
 
 Settings = _Settings()
