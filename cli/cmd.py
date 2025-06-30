@@ -219,7 +219,7 @@ def generate_business_plan():
 
 
 @command(help_text='Deploy latest landing page for Business')
-def deploy_landing_page():
+def deploy_app():
     token = HonulabsToken()
     api_client = HonulabsAPIClient(token.token)
     business_id = pick_business(TABLE_STYLE)
