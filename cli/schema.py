@@ -294,3 +294,11 @@ class FullBusinessDetailsCreate(BaseModel):
 
 class VercelSecrets(BaseModel):
     secrets: dict[str, Any]
+
+
+class Collaborator(BaseModel):
+    username: str
+
+
+class Collaborators(BaseModel):
+    collaborators: list[Collaborator]

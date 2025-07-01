@@ -12,7 +12,7 @@ from typing import Callable, Dict, Optional
 from tabulate import tabulate
 
 from cli.api_client import HonulabsAPIClient
-from cli.schema import JobStatus, VercelSecrets
+from cli.schema import JobStatus, VercelSecrets, Collaborators, Collaborator
 from cli.utils.handle_business_generation import BusinessPlanGeneration
 from cli.utils.job_manager import JobManager
 from cli.utils.pick_business import pick_business
@@ -325,3 +325,35 @@ def pending_jobs():
         manager.await_job_completion()
     except (KeyboardInterrupt, EOFError):
         return
+
+@command(help_text="Invite user to the business GitHub repository")
+def invite_to_repo():
+    token = HonulabsToken()
+    api_client = HonulabsAPIClient(token.token)
+    business_id = pick_business(TABLE_STYLE)
+    if business_id is None:
+        return
+
+    invitees= []
+    print('Input the username you want to invite. When you are done press enter.\n')
+    while True:
+        invitee = input('username: ').strip()
+        if invitee == '':
+            break
+        invitees.append(Collaborator(username=invitee))
+        print()
+
+    if not invitees:
+        print('Not inviting anyone!')
+        return
+
+    # Set up the job
+    job = api_client.invite_collaborators(business_id, Collaborators(collaborators=invitees))
+    print('Deployment job started successfully. Awaiting completion. Skip wait with Ctrl+C.')
+    manager = JobManager(job)
+    try:
+        manager.await_job_completion()
+    except (KeyboardInterrupt, EOFError):
+        manager.spinner.stop()
+        print(f'Skipping wait for job completion. Job will continue running in the background, with id {job.job_id}')
+
