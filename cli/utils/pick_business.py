@@ -9,7 +9,7 @@ def pick_business(table_style: str) -> str | None:
     api_client = HonulabsAPIClient(token.token)
     businesses = api_client.list_businesses()
     if not businesses:
-        print('You have no businesses yet!')
+        print('You have no ideas yet! Please use `create_idea` to create a new one!')
         return
 
     data = {
@@ -21,12 +21,12 @@ def pick_business(table_style: str) -> str | None:
     }
 
     print(tabulate(
-        ({'Number': num, 'Business Name': data[num]['name']} for num in sorted(data)),
+        ({'Number': num, 'Name': data[num]['name']} for num in sorted(data)),
         headers='keys',
         tablefmt=table_style,
     ))
     try:
-        print('Please select the number of the business to interact with, or press ENTER to cancel.')
+        print('Please select the number of the idea to interact with, or press ENTER to cancel.')
         selected_num = input('> ').strip()
         if selected_num == '':
             return

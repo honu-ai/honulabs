@@ -159,21 +159,23 @@ class HonulabsCommandPrompt(cmd.Cmd):
 def login(token: str):
     # Check token
     api_client = HonulabsAPIClient(token)
-    if api_client.check_token():
-        print(LOGGED_IN_HEADER)
-        HonulabsToken(token)
-    else:
-        print('Token was invalid, please try again')
+    with Halo(text='Checking Token', spinner='dots'):
+        if api_client.check_token():
+            print(LOGGED_IN_HEADER)
+            HonulabsToken(token)
+        else:
+            print('Token was invalid, please try again')
 
 
 @command(help_text='List your Businesses')
-def list_businesses():
+def list_ideas():
     token = HonulabsToken()
-    api_client = HonulabsAPIClient(token.token)
-    businesses = api_client.list_businesses()
-    if not businesses:
-        print('You have no businesses yet!')
-        return
+    with Halo(text='Fetching Ideas', spinner='dots'):
+        api_client = HonulabsAPIClient(token.token)
+        businesses = api_client.list_businesses()
+        if not businesses:
+            print('You have no ideas yet! Please use `create_idea` to make one!')
+            return
 
     print(tabulate(
         ({'id': biz.business_id, 'name': biz.name} for biz in businesses),
@@ -182,17 +184,17 @@ def list_businesses():
     ))
 
 
-@command(help_text='Create new Business record')
+@command(help_text='Create new Idea')
 def create_business(*name: str):
     token = HonulabsToken()
     api_client = HonulabsAPIClient(token.token)
     name = ' '.join(name)
     biz = api_client.create_business(name)
-    print(f'Business record "{biz.name}" created!')
+    print(f'Idea record "{biz.name}" created!')
 
 
-@command(help_text='Delete Business')
-def delete_business():
+@command(help_text='Delete Idea and deployed services')
+def delete_idea():
     token = HonulabsToken()
     api_client = HonulabsAPIClient(token.token)
     business_id = pick_business(TABLE_STYLE)
@@ -210,7 +212,7 @@ def delete_business():
         print(f'Skipping wait for job completion. Job will continue running in the background, with id {job.job_id}')
 
 
-@command(help_text='Begin generation of Business Plan')
+@command(help_text='Begin generation of Business Plan for an Idea')
 def generate_business_plan():
     business_id = pick_business(TABLE_STYLE)
     if business_id is None:
@@ -219,7 +221,7 @@ def generate_business_plan():
     generator.run()
 
 
-@command(help_text='Deploy latest landing page for Business')
+@command(help_text='Deploy latest landing page for Business Idea')
 def deploy_app():
     token = HonulabsToken()
     api_client = HonulabsAPIClient(token.token)
