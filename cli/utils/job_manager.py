@@ -45,7 +45,7 @@ class JobManager:
                 return 'Running'
             return self.job.message
 
-    def await_job_completion(self) -> HonulabsJob:
+    def await_job_completion(self, retry=True) -> HonulabsJob:
         # Loop requests to the API, give status message from the Job while it's still running
         self.spinner = Halo(text=self._message, spinner=LOADING_BAR)
         self.spinner.start()
@@ -63,10 +63,15 @@ class JobManager:
         self.spinner.stop()
         if self.job.status == JobStatus.SUCCESS:
             print('Job finished successfully')
-        else:
+        elif self.job.status == JobStatus.FAILED:
             if self.job.error is not None:
                 print(f'Job failed with error message: {self.job.error}')
             else:
                 print('Job was unsuccessful but had no error message')
+        else:
+            if retry:
+                self.await_job_completion(False)
+            else:
+                print('Job was unable to be read and failed')
 
         return self.job
