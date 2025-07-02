@@ -1,14 +1,9 @@
-import readline # <- do not remove, this lifts the 1024 char input limit on Mac
-import traceback
-
-import shutil
-
-import urllib
-
 import cmd
 import inspect
+import traceback
 from typing import Callable, Dict, Optional
 
+from halo import Halo
 from tabulate import tabulate
 
 from cli.api_client import HonulabsAPIClient
@@ -189,7 +184,8 @@ def create_business(*name: str):
     token = HonulabsToken()
     api_client = HonulabsAPIClient(token.token)
     name = ' '.join(name)
-    biz = api_client.create_business(name)
+    with Halo(text='Creating Idea', spinner='dots'):
+        biz = api_client.create_business(name)
     print(f'Idea record "{biz.name}" created!')
 
 

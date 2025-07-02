@@ -2,10 +2,11 @@ import webbrowser
 from tempfile import TemporaryDirectory
 
 from pydantic import BaseModel
+from tabulate import tabulate
 
 from cli.api_client import HonulabsAPIClient
 from cli.schema import BusinessPlanRequirementsCreate, JobStatus, BusinessPlanRequirements, BusinessPlan, \
-    BusinessNamesDomains
+    BusinessNamesDomains, HonulabsJob
 from cli.utils.job_manager import JobManager
 from cli.utils.token import HonulabsToken
 
@@ -40,6 +41,40 @@ class BusinessPlanGeneration:
         print()
         self._generate_full_business_plan(base_business_plan, business_name)
 
+    def _check_for_finished_job_in_step(self, step: str):
+        return self.api_client.get_jobs(
+            self.business_id,
+            step,
+            JobStatus.SUCCESS,
+        )
+
+    def _select_finished_job(self, jobs: list[HonulabsJob]) -> dict | None:
+        data = {
+            str(num): job
+            for num, job in enumerate(jobs, start=1)
+        }
+
+        print(tabulate(
+            ({'Number': num, 'Finished At': data[num].finished_at.isoformat()} for num in sorted(data)),
+            headers='keys',
+            tablefmt='double_grid',
+        ))
+        try:
+            print('Please input the number of the finished job you would like to use, or just press ENTER to start again.')
+            selected_num = input('> ').strip()
+            if selected_num == '':
+                return
+
+            while selected_num not in data:
+                print('That number is not a valid choice, please select a valid choice or press ENTER to cancel.')
+                selected_num = input('> ').strip()
+                if selected_num == '':
+                    return
+
+            return data[selected_num].result
+        except (KeyboardInterrupt, EOFError):
+            return
+
     def _verify_result(self, result: BaseModel, html: bool = False) -> bool:
         extension = 'html' if html else 'md'
         with TemporaryDirectory(ignore_cleanup_errors=True) as dir_path:
@@ -73,85 +108,95 @@ class BusinessPlanGeneration:
     def _get_business_plan_requirements(self) -> BusinessPlanRequirements | None:
         print('Step 1: Business Plan Requirements')
 
-        # Check for in progress jobs of the matching type (TODO - later)
-        # in_progress_jobs = self.api_client.get_jobs(
-        #     self.business_id,
-        #     self.REQUIREMENTS_JOB_TYPE,
-        #     JobStatus.IN_PROGRESS,
-        # )
-        # if in_progress_jobs:
-        #     print('Found the following jobs that are in progress. Please select one to wait for.')
-        #     job = self._select_job(in_progress_jobs)
-        #     if job is None:
+        finished_jobs = self._check_for_finished_job_in_step('business_plan_requirements')
+        result = None
+        if finished_jobs:
+            print('Found following completed Business Plan Requirements generation jobs.')
+            result = self._select_finished_job(finished_jobs)
+            if result is None:
+                print('Not using existing result, starting generation of new business plan requirements!')
 
-        print('Please answer the following prompts.')
-        print()
-
-        requirements_data = {}
-        for name, field in BusinessPlanRequirementsCreate.model_fields.items():
-            response = input(f'{field.description} ')
-            requirements_data[name] = response.strip()
+        if result is None:
+            print('Please answer the following prompts.')
             print()
 
-        payload = BusinessPlanRequirementsCreate(**requirements_data)
-        yes_no = input('Is this okay? [y/n] ').strip().lower()
-        if yes_no[0] != 'y':
-            print('Please re-run the command to start again')
-            return
+            requirements_data = {}
+            for name, field in BusinessPlanRequirementsCreate.model_fields.items():
+                response = input(f'{field.description} ')
+                requirements_data[name] = response.strip()
+                print()
 
-        job = self.api_client.generate_business_requirements(self.business_id, payload)
-        print('Requirements Generation started successfully. Awaiting completion.')
-        print('Please ensure you wait for this Job to finish as there is currently no way to continue an existing job.')
-        print()
-        manager = JobManager(job)
-        try:
-            job = manager.await_job_completion()
-        except (KeyboardInterrupt, EOFError):
-            manager.spinner.stop()
+            payload = BusinessPlanRequirementsCreate(**requirements_data)
+            yes_no = input('Is this okay? [y/n] ').strip().lower()
+            if yes_no[0] != 'y':
+                print('Please re-run the command to start again')
+                return
+
+            job = self.api_client.generate_business_requirements(self.business_id, payload)
+            print('Requirements Generation started successfully. Awaiting completion.')
+            print('Please ensure you wait for this Job to finish as there is currently no way to continue an existing job.')
             print()
-            print('Are you sure you want to skip the job? You currently cannot continue from an existing job. Press Ctrl+C again to confirm cancelling.')
+            manager = JobManager(job)
             try:
                 job = manager.await_job_completion()
             except (KeyboardInterrupt, EOFError):
-                print('Exiting')
+                manager.spinner.stop()
+                print()
+                print('Are you sure you want to skip the job? You currently cannot continue from an existing job. Press Ctrl+C again to confirm cancelling.')
+                try:
+                    job = manager.await_job_completion()
+                except (KeyboardInterrupt, EOFError):
+                    print('Exiting')
+                    return
+
+            # Put the data into files and let the user read them for verification
+            if job.status == JobStatus.FAILED:
                 return
+            result = job.result
 
-        # Put the data into files and let the user read them for verification
-        if job.status == JobStatus.FAILED:
-            return
-
-        requirements = BusinessPlanRequirements(**job.result)
+        requirements = BusinessPlanRequirements(**result)
         if self._verify_result(requirements):
             return requirements
         return None
 
     def _get_base_business_plan(self, requirements: BusinessPlanRequirements) -> BusinessPlan | None:
         print('Step 2: Base Business Plan Generation')
-        print('We will now begin generating a basic business plan for you, please wait')
 
-        job = self.api_client.generate_base_business_plan(self.business_id, requirements)
-        print('Base Business Plan generation started successfully. Awaiting completion.')
-        print('Please ensure you wait for this Job to finish as there is currently no way to continue an existing job.')
-        print()
-        manager = JobManager(job)
-        try:
-            job = manager.await_job_completion()
-        except (KeyboardInterrupt, EOFError):
-            manager.spinner.stop()
+        finished_jobs = self._check_for_finished_job_in_step('base_business_plan')
+        result = None
+        if finished_jobs:
+            print('Found following completed Base Business Plan generation jobs.')
+            result = self._select_finished_job(finished_jobs)
+            if result is None:
+                print('Not using existing result, starting generation of new base business plan!')
+
+        if result is None:
+            print('We will now begin generating a basic business plan for you, please wait')
+
+            job = self.api_client.generate_base_business_plan(self.business_id, requirements)
+            print('Base Business Plan generation started successfully. Awaiting completion.')
+            print('Please ensure you wait for this Job to finish as there is currently no way to continue an existing job.')
             print()
-            print(
-                'Are you sure you want to skip the job? You currently cannot continue from an existing job. Press Ctrl+C again to confirm cancelling.')
+            manager = JobManager(job)
             try:
                 job = manager.await_job_completion()
             except (KeyboardInterrupt, EOFError):
-                print('Exiting')
+                manager.spinner.stop()
+                print()
+                print(
+                    'Are you sure you want to skip the job? You currently cannot continue from an existing job. Press Ctrl+C again to confirm cancelling.')
+                try:
+                    job = manager.await_job_completion()
+                except (KeyboardInterrupt, EOFError):
+                    print('Exiting')
+                    return
+
+            # Put the data into files and let the user read them for verification
+            if job.status == JobStatus.FAILED:
                 return
+            result = job.result
 
-        # Put the data into files and let the user read them for verification
-        if job.status == JobStatus.FAILED:
-            return
-
-        plan = BusinessPlan(**job.result)
+        plan = BusinessPlan(**result)
         if self._verify_result(plan, True):
             return plan
         return None
