@@ -167,7 +167,7 @@ class BusinessPlanGeneration:
 
         name = input(
             'Please input an official name for your business. '
-            'Alternatively, just press ENTER if you want us to generate some new ideas.',
+            'Alternatively, just press ENTER if you want us to generate some new ideas. ',
         )
         name = name.strip()
         if name:
