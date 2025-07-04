@@ -2,7 +2,7 @@ import httpx
 from starlette import status
 
 from cli.schema import HonulabsBusiness, HonulabsJob, JobStatus, BusinessPlanRequirementsCreate, \
-    BusinessPlanRequirements, VercelSecrets, BusinessPlan, FullBusinessDetailsCreate
+    BusinessPlanRequirements, VercelSecrets, BusinessPlan, FullBusinessDetailsCreate, Collaborators
 from cli.settings import Settings
 
 
@@ -116,3 +116,13 @@ class HonulabsAPIClient:
         if response.status_code != status.HTTP_202_ACCEPTED:
             raise Exception(f'Could not start secret variable upload: {response.text}')
         return HonulabsJob(**response.json())
+
+    def invite_collaborators(self, business_id: str, invitees: Collaborators):
+        response = self.client.post(
+            f'/v1/businesses/{business_id}/jobs/add_user_to_repo',
+            json=invitees.model_dump(),
+        )
+        if response.status_code != status.HTTP_202_ACCEPTED:
+            raise Exception(f'Could not start secret variable upload: {response.text}')
+        return HonulabsJob(**response.json())
+
