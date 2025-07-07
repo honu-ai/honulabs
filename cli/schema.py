@@ -302,3 +302,12 @@ class Collaborator(BaseModel):
 
 class Collaborators(BaseModel):
     collaborators: list[Collaborator]
+
+from pydantic import BaseModel
+
+class TokenSet(BaseModel):
+    access_token: str
+    id_token: str
+    scope: str
+    expires_in: int
+    token_type: str
