@@ -2,7 +2,7 @@ import httpx
 from starlette import status
 
 from cli.schema import HonulabsBusiness, HonulabsJob, JobStatus, BusinessPlanRequirementsCreate, \
-    BusinessPlanRequirements, VercelSecrets, BusinessPlan, FullBusinessDetailsCreate, Collaborators
+    BusinessPlanRequirements, VercelSecrets, BusinessPlan, FullBusinessDetailsCreate, Collaborators, MarketSegment
 from cli.settings import Settings
 
 
@@ -123,6 +123,24 @@ class HonulabsAPIClient:
             json=invitees.model_dump(),
         )
         if response.status_code != status.HTTP_202_ACCEPTED:
-            raise Exception(f'Could not start secret variable upload: {response.text}')
+            raise Exception(f'Could not invite user: {response.text}')
         return HonulabsJob(**response.json())
 
+    def generate_market_segment(self, business_id: str, geography: str, segment: str):
+        response = self.client.post(
+            f'/v1/businesses/{business_id}/jobs/industry_idea_segmentation',
+            json=dict(geography=geography, industry=segment),
+        )
+        if response.status_code != status.HTTP_202_ACCEPTED:
+            raise Exception(f'Could not start Idea Generation process: {response.text}: {response.status_code}')
+        return HonulabsJob(**response.json())
+
+    def idea_generation(self, business_id: str, geography: str, market_segment: MarketSegment):
+        response = self.client.post(
+            f'/v1/businesses/{business_id}/jobs/idea_generation',
+            json=market_segment.model_dump(),
+            params=dict(geography=geography)
+        )
+        if response.status_code != status.HTTP_202_ACCEPTED:
+            raise Exception(f'Could not start Idea Generation process: {response.text}: {response.status_code}')
+        return HonulabsJob(**response.json())

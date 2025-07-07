@@ -9,6 +9,7 @@ from tabulate import tabulate
 from cli.api_client import HonulabsAPIClient
 from cli.schema import JobStatus, VercelSecrets, Collaborators, Collaborator
 from cli.utils.handle_business_generation import BusinessPlanGeneration
+from cli.utils.handle_idea_generation import IdeaGeneration
 from cli.utils.job_manager import JobManager
 from cli.utils.pick_business import pick_business
 from cli.utils.token import HonulabsToken
@@ -356,3 +357,17 @@ def invite_to_repo():
         manager.spinner.stop()
         print(f'Skipping wait for job completion. Job will continue running in the background, with id {job.job_id}')
 
+
+@command(help_text="generate a new idea")
+def new_business_idea():
+    token = HonulabsToken()
+    api_client = HonulabsAPIClient(token.token)
+    business_id = pick_business(TABLE_STYLE)
+    if business_id is None:
+        return
+
+    idea_generator = IdeaGeneration(business_id, TABLE_STYLE)
+    new_idea = idea_generator.run()
+
+    generator = BusinessPlanGeneration(business_id, TABLE_STYLE)
+    generator.run(new_idea)

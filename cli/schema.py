@@ -302,3 +302,9 @@ class Collaborator(BaseModel):
 
 class Collaborators(BaseModel):
     collaborators: list[Collaborator]
+
+
+class MarketSegment(BaseModel):
+    core_market: str
+    sub_category: str
+    niche: str
