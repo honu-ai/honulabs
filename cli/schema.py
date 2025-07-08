@@ -308,3 +308,11 @@ class MarketSegment(BaseModel):
     core_market: str
     sub_category: str
     niche: str
+
+
+class TokenSet(BaseModel):
+    access_token: str
+    id_token: str
+    scope: str
+    expires_in: int
+    token_type: str

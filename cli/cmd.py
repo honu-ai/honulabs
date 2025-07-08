@@ -1,5 +1,6 @@
 import cmd
 import inspect
+import socket
 import traceback
 from typing import Callable, Dict, Optional
 
@@ -7,7 +8,9 @@ from halo import Halo
 from tabulate import tabulate
 
 from cli.api_client import HonulabsAPIClient
+from cli.auth_client import handle_request, HonulabsAuthClient, spinup_single_use_server
 from cli.schema import JobStatus, VercelSecrets, Collaborators, Collaborator
+from cli.settings import Settings
 from cli.utils.handle_business_generation import BusinessPlanGeneration
 from cli.utils.handle_idea_generation import IdeaGeneration
 from cli.utils.job_manager import JobManager
@@ -151,8 +154,8 @@ class HonulabsCommandPrompt(cmd.Cmd):
 
 
 # Commands
-@command(help_text="Set token for API usage")
-def login(token: str):
+@command(help_text="Set token for API usage manually")
+def token_login(token: str):
     # Check token
     api_client = HonulabsAPIClient(token)
     with Halo(text='Checking Token', spinner='dots'):
@@ -357,6 +360,23 @@ def invite_to_repo():
         manager.spinner.stop()
         print(f'Skipping wait for job completion. Job will continue running in the background, with id {job.job_id}')
 
+@command(help_text="Login to the Honu platform")
+def login():
+    """ Login to the platform using the CLI """
+    auth_client = HonulabsAuthClient()
+    url = auth_client.get_login_url()
+
+    print("--------------")
+    print()
+    print("Cmd + click (or copy and paste the link in the browser) to login:")
+    print(f"{url}")
+    print()
+    print("--------------")
+
+    code = spinup_single_use_server()
+    with Halo(text='Checking Token', spinner='dots'):
+        auth_client.exchange_token(code)
+        print(LOGGED_IN_HEADER)
 
 @command(help_text="generate a new idea")
 def new_business_idea():
