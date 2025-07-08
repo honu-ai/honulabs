@@ -20,14 +20,14 @@ class BusinessPlanGeneration:
         self.business_id = business_id
         self.table_style = table_style
 
-    def run(self):
+    def run(self, initial_idea: str | None = None):
         """
         Step 1: Requirements Generation
             - If there are no successful jobs already, do the generation from the start
             - Otherwise, allow the User to choose existing results
             - Render the outputs in markdown files and present to the user for validation
         """
-        requirements = self._get_business_plan_requirements()
+        requirements = self._get_business_plan_requirements(initial_idea)
         if requirements is None:
             return
         print()
@@ -105,7 +105,7 @@ class BusinessPlanGeneration:
             print()
             return input('Are you happy with the result? [y/n] ').lower().strip().startswith('y')
 
-    def _get_business_plan_requirements(self) -> BusinessPlanRequirements | None:
+    def _get_business_plan_requirements(self, previous_idea: str | None) -> BusinessPlanRequirements | None:
         print('Step 1: Business Plan Requirements')
 
         finished_jobs = self._check_for_finished_job_in_step('business_plan_requirements')
@@ -122,9 +122,13 @@ class BusinessPlanGeneration:
 
             requirements_data = {}
             for name, field in BusinessPlanRequirementsCreate.model_fields.items():
-                response = input(f'{field.description} ')
-                requirements_data[name] = response.strip()
-                print()
+                if name == 'idea' and previous_idea:
+                    print(f"Using the generated idea : {previous_idea['saas_venture_description']}")
+                    requirements_data[name] = previous_idea['saas_venture_description']
+                else:
+                    response = input(f'{field.description} ')
+                    requirements_data[name] = response.strip()
+                    print()
 
             payload = BusinessPlanRequirementsCreate(**requirements_data)
             yes_no = input('Is this okay? [y/n] ').strip().lower()

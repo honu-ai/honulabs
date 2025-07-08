@@ -303,7 +303,12 @@ class Collaborator(BaseModel):
 class Collaborators(BaseModel):
     collaborators: list[Collaborator]
 
-from pydantic import BaseModel
+
+class MarketSegment(BaseModel):
+    core_market: str
+    sub_category: str
+    niche: str
+
 
 class TokenSet(BaseModel):
     access_token: str
