@@ -29,7 +29,6 @@ class IdeaGeneration:
         if not new_idea:
             return
 
-        print(new_idea)
         return new_idea
 
     def _idea_generation(self, segment: dict):
