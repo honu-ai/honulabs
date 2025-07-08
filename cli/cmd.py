@@ -420,6 +420,7 @@ def mcp_configuration(path_to_mcp_repo: str):
         }
     }
 
+    print()
     print(f"Add this configuration to your Claude desktop tools to make the HONU MCP server available")
     print("-------------------------------------")
     print(json.dumps(config))
