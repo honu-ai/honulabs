@@ -98,7 +98,7 @@ class IdeaGeneration:
                 return
 
             print(f"You are about to generate ideas for {industry.capitalize()} / {geography.capitalize()}")
-            print(f"Doc you want to continue? (Y/n)")
+            print(f"Do you want to continue? (Y/n)")
             if input('> ').lower() != 'y':
                 return
 

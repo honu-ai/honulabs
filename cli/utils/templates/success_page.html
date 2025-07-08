@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .success-container {
+            background: white;
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+            }
+            70% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 20px rgba(76, 175, 80, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+            }
+        }
+
+        .success-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .success-message {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 600px) {
+            .success-container {
+                padding: 2rem 1.5rem;
+            }
+
+            .success-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-icon">
+            <svg width="50" height="35" viewBox="0 0 243 150" xmlns="http://www.w3.org/2000/svg">
+                <path d="M159.5 92.3C192.3 90.8 216.7 76.6 216.7 76.6C249 60.4 242.7 31.4 242.7 31.4C229.1 20.6 209.9 37 209.9 37C190.7 103.1 61.6 102.1 61.6 102.1C93 106.7 131.7 105.4 131.7 105.4C121.6 121.6 78.3 145.7 78.3 145.7C124.7 145.2 159.4 115.2 159.4 115.2L188.2 93.6C175.2 94.4 159.5 92.3 159.5 92.3ZM226.8 35.8C230.1 35.8 232.8 38.5 232.8 41.8C232.8 45.1 230.1 47.8 226.8 47.8C223.5 47.8 220.8 45.1 220.8 41.8C220.8 38.5 223.5 35.8 226.8 35.8ZM137.3 88.8C137.3 88.8 143.6 87.3 152.4 84L153.1 83.9V83.7001C172.8 76.2001 204.3 60 207.4 32L184.5 21.6C184.7 20.9 184.8 20.2 184.8 19.5C184.8 15.8 181.8 12.8 178.1 12.8C175 12.8 172.5 14.8 171.7 17.6L115.4 7.30005C115.4 7.10005 115.4 6.90007 115.4 6.70007C115.4 3.00007 112.4 0 108.7 0C105 0 102 3.00007 102 6.70007C102 7.50007 102.2 8.29998 102.4 9.09998L51.5 35.8C50.3 34 48.2 32.8 45.9 32.8C42.2 32.8 39.2 35.8 39.2 39.5C39.2 41.3 39.9 43.0001 41.1 44.2001L7.20001 86.6C7.20001 86.7 52.7 111.2 137.3 88.8ZM9.40002 87.2001L42.5 72.1C43.5 74.6 45.9 76.4 48.8 76.4C51.2 76.4 53.2 75.2 54.4 73.3L84.7 88.2001C42.6 93.3001 16.7 88.8001 9.40002 87.2001ZM87.2 87.9L55 72.1C55.3 71.4 55.4 70.5001 55.4 69.7001C55.4 68.6001 55.1 67.6 54.7 66.6L87.3 52.2001C88.5 54.2001 90.6 55.6 93.1 55.6H93.2L96.9 86.5C93.6 87 90.4 87.5 87.2 87.9ZM98.3 86.3L94.6 55.4C97.6 54.7 99.8 52.1 99.8 48.9L140.5 45.2001C140.7 46.3001 141.2 47.4001 141.9 48.2001L106.5 84.8C103.7 85.4 100.9 85.9 98.3 86.3ZM133.3 79.1C124.8 81.2 116.6 83 108.9 84.4L142.9 49.2001C144 50.1001 145.5 50.6 147 50.6C147.1 50.6 147.1 50.6 147.2 50.6L150.3 74.1C140.5 77.5 133.3 79.1 133.3 79.1ZM151.7 73.7001L148.6 50.5C150.4 50.1 152 48.9 152.9 47.3L182.4 60.1C172.3 66.1 161 70.6001 151.7 73.7001ZM183.9 59.2001L153.5 46C153.7 45.4 153.8 44.7 153.8 44C153.8 43.8 153.8 43.6 153.8 43.5L207 33.6C204.2 43.9 194.9 52.4001 183.9 59.2001ZM173.3 24.3C174.5 25.6 176.2 26.3 178.1 26.3C180.6 26.3 182.7 25 183.9 23L205.1 32.5L153.5 42C153.3 41.4 153.1 40.9 152.7 40.3L173.3 24.3ZM115.1 8.80005L171.4 19.1C171.4 19.3 171.4 19.4 171.4 19.6C171.4 20.9 171.8 22.1001 172.4 23.2001L151.8 39.3C150.6 38 148.9 37.3 147 37.3C145.4 37.3 143.8 37.9 142.7 38.9L113.9 11.2001C114.4 10.4001 114.9 9.70005 115.1 8.80005ZM108.7 13.6C110.3 13.6 111.7 13.1 112.9 12.1L141.8 39.8C140.9 40.9 140.4 42.3 140.4 43.8L99.8 47.5C99.4 45.4 98 43.7 96.2 42.8L107 13.3C107.4 13.5 108 13.6 108.7 13.6ZM103 10.5C103.6 11.5 104.5 12.3 105.5 12.8L94.7 42.4C94.2 42.3 93.6 42.2001 93.1 42.2001C90.1 42.2001 87.5 44.2 86.7 47L52.6 40.5C52.6 40.2 52.7 39.9001 52.7 39.7001C52.7 38.8001 52.5 38 52.2 37.3L103 10.5ZM52.2 41.8L86.3 48.3C86.3 48.5 86.3 48.7 86.3 48.9C86.3 49.6 86.4 50.3 86.6 51L53.8 65.5C52.6 64 50.7 63 48.6 63C48.4 63 48.2 63 48.1 63L46.7 46.2001C49.3 45.9001 51.4 44.1 52.2 41.8ZM42.2 45.2001C43.1 45.8001 44.2 46.2 45.4 46.3L46.8 63.3C44 64.1 42 66.7001 42 69.7001C42 70.1001 42 70.4 42.1 70.8L10.2 85.4L42.2 45.2001ZM0 124.1C0 124.1 32.6 118.9 61.6 102.1C61.6 102.1 37.2 100.2 27.6 96.7001C27.6 96.7001 21.5 114.8 0 124.1Z" fill="white"/>
+            </svg>
+        </div>
+
+        <h1 class="success-title">Success!</h1>
+
+        <p class="success-message">
+            You are now logged in! You can close this tab and return to your CLI to continue.
+        </p>
+    </div>
+</body>
+</html>

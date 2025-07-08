@@ -1,5 +1,6 @@
 import socket
 import urllib
+from pathlib import Path
 
 import httpx
 from starlette import status
@@ -22,7 +23,8 @@ def handle_request(client_socket):
         code = query['code'][0]
 
         # Send a simple HTTP response
-        content = "<html><body><h1>success! you can close thi window and return to the cli.</h1></body></html>"
+        success_page_path = Path(__file__).parent / 'utils/templates/success_page.html'
+        content = open(success_page_path).read()
         response = f"""HTTP/1.1 200 OK
 Content-Type: text/html
 Content-Length: {len(content)}
@@ -96,7 +98,7 @@ class HonulabsAuthClient:
         honu_auth_base_url = Settings.AUTH_URL
         get_token_path = "/v1/token/get_token"
         url = urllib.parse.urljoin(honu_auth_base_url, get_token_path)
-        response = httpx.post(url, params=dict(code=code))
+        response = httpx.post(url, params=dict(code=code), timeout=240)
         if response.status_code != status.HTTP_200_OK:
             print(f"There was a problem getting the token from the server {response.status_code} : {response.text}")
 
