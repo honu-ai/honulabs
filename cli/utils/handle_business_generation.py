@@ -275,4 +275,4 @@ class BusinessPlanGeneration:
         if job.status == JobStatus.FAILED:
             return
 
-        print('Now you can run `deploy_page` command to deploy your landing page.')
+        print('Now you can run `deploy_app` command to deploy your landing page.')
