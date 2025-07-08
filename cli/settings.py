@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 
 
 class _Settings(BaseSettings):
-    API_URL: str = 'https://honulabs-api.honotech.dev'
+    API_URL: str = 'https://honulabs-api.honutech.dev'
     AUTH_URL: str = 'https://auth.honutech.dev'
 
     AUTH0_DOMAIN: str = "honu-dev-1.uk.auth0.com"
