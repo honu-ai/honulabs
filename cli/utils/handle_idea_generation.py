@@ -1,3 +1,4 @@
+import os
 import webbrowser
 from tempfile import TemporaryDirectory
 
@@ -52,6 +53,9 @@ class IdeaGeneration:
             return
 
         categories = {str(i): j for i, j in enumerate(job.result['ideas'], start=1)}
+
+        # Compute window size to wrap the table
+        terminal_size_columns = int(os.get_terminal_size().columns - (os.get_terminal_size().columns*.1))
         print(
             tabulate(
                 (
@@ -64,7 +68,8 @@ class IdeaGeneration:
                     }
                     for k, v in categories.items()
                 ),
-                headers='keys', tablefmt='double_grid')
+                headers='keys', tablefmt='double_grid', maxcolwidths=terminal_size_columns//5
+            )
         )
         try:
             print('Please select one of the ideas, or just press ENTER to start again.')
@@ -125,6 +130,8 @@ class IdeaGeneration:
 
         categories = {str(i): j for i, j in enumerate(job.result['ideas'], start=1)}
 
+        # Compute window size to wrap the table
+        terminal_size_columns = int(os.get_terminal_size().columns - (os.get_terminal_size().columns*.1))
         print(
             tabulate(
                 (
@@ -133,7 +140,9 @@ class IdeaGeneration:
                     }
                     for k, v in categories.items()
                 ),
-                headers='keys', tablefmt='double_grid'))
+                headers='keys', tablefmt='double_grid', maxcolwidths=terminal_size_columns//3
+            )
+        )
         try:
             print('Please select the market segment you want to use, or just press ENTER to start again.')
             selected_num = input('> ').strip()
