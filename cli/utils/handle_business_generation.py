@@ -131,10 +131,17 @@ class BusinessPlanGeneration:
                     print()
 
             payload = BusinessPlanRequirementsCreate(**requirements_data)
-            yes_no = input('Is this okay? [y/n] ').strip().lower()
-            if yes_no[0] != 'y':
-                print('Please re-run the command to start again')
-                return
+
+            while True:
+                yes_no = input('Is this okay? [y/n] ').strip().lower()
+                if yes_no == 'y':
+                    break
+                elif yes_no == 'n':
+                    print('Please re-run the command to start again')
+                    return
+                else:
+                    print(f'\"{yes_no}\" is not a valid response, please use y/n')
+
 
             job = self.api_client.generate_business_requirements(self.business_id, payload)
             print('Requirements Generation started successfully. Awaiting completion.')
