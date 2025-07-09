@@ -235,7 +235,13 @@ def deploy_app():
     print('Deployment job started successfully. Awaiting completion. Skip wait with Ctrl+C.')
     manager = JobManager(job)
     try:
-        manager.await_job_completion()
+        job = manager.await_job_completion()
+        result = job.result
+        print()
+        print("Your app is ready at: ")
+        print(tabulate({"Links": result['app_links']}))
+        print()
+
     except (KeyboardInterrupt, EOFError):
         manager.spinner.stop()
         print(f'Skipping wait for job completion. Job will continue running in the background, with id {job.job_id}')
@@ -392,7 +398,6 @@ def new_business_idea():
 
     generator = BusinessPlanGeneration(business_id, TABLE_STYLE)
     generator.run(new_idea)
-
 
 
 @command(help_text="Print MCP configuration for claude desktop")
