@@ -237,9 +237,13 @@ def deploy_app():
     try:
         job = manager.await_job_completion()
         result = job.result
+        app_links = result['app_links']
         print()
-        print("Your app is ready at: ")
-        print(tabulate({"Links": result['app_links']}))
+        print("🚀 Your app is ready!")
+        print()
+        print("📱 Access your app at:")
+        for i, link in enumerate(app_links, 1):
+            print(f"   {i}. {link}")
         print()
 
     except (KeyboardInterrupt, EOFError):
@@ -362,7 +366,14 @@ def invite_to_repo():
     print('Deployment job started successfully. Awaiting completion. Skip wait with Ctrl+C.')
     manager = JobManager(job)
     try:
-        manager.await_job_completion()
+        result = manager.await_job_completion()
+        repo_name = result.result['repo']
+        print()
+        print(f"✅ Invitations sent for repository: {repo_name}")
+        print("📧 Please check your email for the invitation. If you don't receive it within")
+        print("   a few minutes, please try again or contact us for assistance.")
+        print()
+
     except (KeyboardInterrupt, EOFError):
         manager.spinner.stop()
         print(f'Skipping wait for job completion. Job will continue running in the background, with id {job.job_id}')
