@@ -1,7 +1,5 @@
 import cmd
 import inspect
-import json
-import shutil
 import traceback
 from typing import Callable, Dict, Optional
 
@@ -11,10 +9,10 @@ from tabulate import tabulate
 from cli.api_client import HonulabsAPIClient
 from cli.auth_client import HonulabsAuthClient, spinup_single_use_server
 from cli.schema import Collaborator, Collaborators, JobStatus, VercelSecrets
-from cli.settings import Settings
 from cli.utils.handle_business_generation import BusinessPlanGeneration
 from cli.utils.handle_idea_generation import IdeaGeneration
 from cli.utils.job_manager import JobManager
+from cli.utils.mcp_setup import mcp_connection_string
 from cli.utils.pick_business import pick_business
 from cli.utils.token import HonulabsToken
 
@@ -412,32 +410,13 @@ def new_business_idea():
 
 
 @command(help_text="Print MCP configuration for claude desktop")
-def mcp_configuration(path_to_mcp_repo: str):
-    token = HonulabsToken().token
-    hap_url = Settings.HAP_URL
+def mcp_config_string():
 
-    poetry_bin_path = shutil.which("poetry")
-    config = {
-        "mcpServers": {
-            "HonuMCP": {
-                "command": f"{poetry_bin_path}",
-                "args": [
-                    "run",
-                    "-C",
-                    f"{path_to_mcp_repo}",
-                    "python",
-                    f"{path_to_mcp_repo}/src/main.py"
-                ],
-                "env": {
-                    "HONU_TOKEN": token,
-                    "HONU_PLATFORM_URL": hap_url
-                }
-            }
-        }
-    }
+    token = HonulabsToken().token
+    connection_string = mcp_connection_string(token)
 
     print()
-    print(f"Add this configuration to your Claude desktop tools to make the HONU MCP server available")
+    print("Add this configuration to your Claude desktop tools to make the HONU MCP server available")
     print("-------------------------------------")
-    print(json.dumps(config))
+    print(connection_string)
     print("-------------------------------------")
