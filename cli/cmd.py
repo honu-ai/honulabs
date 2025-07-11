@@ -12,7 +12,10 @@ from cli.schema import Collaborator, Collaborators, JobStatus, VercelSecrets
 from cli.utils.handle_business_generation import BusinessPlanGeneration
 from cli.utils.handle_idea_generation import IdeaGeneration
 from cli.utils.job_manager import JobManager
-from cli.utils.mcp_setup import mcp_connection_string
+from cli.utils.mcp_setup import (
+    claude_desktop_mcp_connection_string,
+    cursor_mcp_connection_string,
+)
 from cli.utils.pick_business import pick_business
 from cli.utils.token import HonulabsToken
 
@@ -422,7 +425,8 @@ def new_business_idea():
 @command(help_text="Print the configuration json to connect to the Honu MCP server")
 def mcp_config_string():
     token = HonulabsToken().token
-    connection_string = mcp_connection_string(token)
+    claude_desktop_connection_string = claude_desktop_mcp_connection_string(token)
+    cursor_connection_string = cursor_mcp_connection_string(token)
 
     print("=" * 64)
     print()
@@ -432,9 +436,17 @@ def mcp_config_string():
     print()
     print("=" * 64)
     print()
-    print(connection_string)
+    print("📋 CLAUDE DESKTOP CONFIGURATION")
+    print()
+    print(claude_desktop_connection_string)
     print()
     print("=" * 64)
     print()
-    print("💡 Copy and paste the JSON above into Claude Desktop's MCP settings")
+    print("🔍 CURSOR CONFIGURATION")
+    print()
+    print(cursor_connection_string)
+    print()
+    print("=" * 64)
+    print()
+    print("💡 Copy and paste the appropriate JSON above into your tool's MCP settings")
     print()

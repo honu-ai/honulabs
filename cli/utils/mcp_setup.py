@@ -2,7 +2,7 @@ import json
 
 from cli.settings import Settings
 
-def mcp_connection_string(token: str):
+def claude_desktop_mcp_connection_string(token: str):
     mcp_server_url = Settings.MCP_SERVER_URL
     config = {
         "mcpServers": {
@@ -19,4 +19,18 @@ def mcp_connection_string(token: str):
         }
     }
 
+    return json.dumps(config)
+
+def cursor_mcp_connection_string(token: str):
+    mcp_server_url = Settings.MCP_SERVER_URL
+    config = {
+        "mcpServers": {
+            "server-name": {
+                "url": mcp_server_url,
+                "headers": {
+                    "Authorization": f"Bearer {token}"
+                }
+            }
+        }
+    }
     return json.dumps(config)
