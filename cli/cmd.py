@@ -165,14 +165,14 @@ def token_login(token: str):
             print('Token was invalid, please try again')
 
 
-@command(help_text='List your Businesses')
-def list_ideas():
+@command(help_text='List your Projects')
+def list_projects():
     token = HonulabsToken()
-    with Halo(text='Fetching Ideas', spinner='dots'):
+    with Halo(text='Fetching Projects', spinner='dots'):
         api_client = HonulabsAPIClient(token.token)
         businesses = api_client.list_businesses()
         if not businesses:
-            print('You have no ideas yet! Please use `create_idea` to make one!')
+            print('You have no Projects yet! Please use `create_project` to make one!')
             return
 
     print(tabulate(
@@ -182,18 +182,18 @@ def list_ideas():
     ))
 
 
-@command(help_text='Create new Idea')
-def create_business(*name: str):
+@command(help_text='Create new Project')
+def create_project(*name: str):
     token = HonulabsToken()
     api_client = HonulabsAPIClient(token.token)
     name = ' '.join(name)
-    with Halo(text='Creating Idea', spinner='dots'):
+    with Halo(text='Creating Project', spinner='dots'):
         biz = api_client.create_business(name)
-    print(f'Idea record "{biz.name}" created!')
+    print(f'Project "{biz.name}" created!')
 
 
-@command(help_text='Delete Idea and deployed services')
-def delete_idea():
+@command(help_text='Delete Project and deployed services')
+def delete_project():
     token = HonulabsToken()
     api_client = HonulabsAPIClient(token.token)
     business_id = pick_business(TABLE_STYLE)
@@ -211,7 +211,7 @@ def delete_idea():
         print(f'Skipping wait for job completion. Job will continue running in the background, with id {job.job_id}')
 
 
-@command(help_text='Begin generation of Business Plan for an Idea')
+@command(help_text='Generate a Business Plan for a Project')
 def generate_business_plan():
     business_id = pick_business(TABLE_STYLE)
     if business_id is None:
@@ -220,7 +220,7 @@ def generate_business_plan():
     generator.run()
 
 
-@command(help_text='Deploy latest landing page for Business Idea')
+@command(help_text='Deploy latest landing page for Project')
 def deploy_app():
     token = HonulabsToken()
     api_client = HonulabsAPIClient(token.token)
@@ -338,7 +338,7 @@ def pending_jobs():
     except (KeyboardInterrupt, EOFError):
         return
 
-@command(help_text="Invite user to the business GitHub repository")
+@command(help_text="Invite user to the project GitHub repository")
 def invite_to_repo():
     token = HonulabsToken()
     api_client = HonulabsAPIClient(token.token)
@@ -347,21 +347,27 @@ def invite_to_repo():
         return
 
     invitees= []
-    print('Input the username you want to invite. When you are done press enter.\n')
+    print('Enter usernames to invite (press Enter on empty line to finish):\n')
     while True:
         invitee = input('username: ').strip()
         if invitee == '':
             break
         invitees.append(Collaborator(username=invitee))
+        print(f'✓ Added "{invitee}"\n')
         print()
 
     if not invitees:
         print('Not inviting anyone!')
         return
 
+    # Confirmation
+    print(f'\n📋 Ready to invite {len(invitees)} user(s):')
+    for i, collab in enumerate(invitees, 1):
+        print(f'   {i}. {collab.username}')
+
     # Set up the job
     job = api_client.invite_collaborators(business_id, Collaborators(collaborators=invitees))
-    print('Deployment job started successfully. Awaiting completion. Skip wait with Ctrl+C.')
+    print('Job started successfully. Awaiting completion. Skip wait with Ctrl+C.')
     manager = JobManager(job)
     try:
         result = manager.await_job_completion()
@@ -382,19 +388,23 @@ def login():
     auth_client = HonulabsAuthClient()
     url = auth_client.get_login_url()
 
-    print("--------------")
     print()
-    print("Cmd + click (or copy and paste the link in the browser) to login:")
-    print(f"{url}")
+    print("=" * 60)
     print()
-    print("--------------")
+    print("🐢 HONU CONNECTION")
+    print()
+    print("Cmd + click (or copy/paste) to login:")
+    print(f"🔗 {url}")
+    print()
+    print("=" * 60)
+    print()
 
     code = spinup_single_use_server()
     with Halo(text='Checking Token', spinner='dots'):
         auth_client.exchange_token(code)
         print(LOGGED_IN_HEADER)
 
-@command(help_text="generate a new idea")
+@command(help_text="generate a new idea for a business")
 def new_business_idea():
     token = HonulabsToken()
     HonulabsAPIClient(token.token)
@@ -409,14 +419,22 @@ def new_business_idea():
     generator.run(new_idea)
 
 
-@command(help_text="Print MCP configuration for claude desktop")
+@command(help_text="Print the configuration json to connect to the Honu MCP server")
 def mcp_config_string():
-
     token = HonulabsToken().token
     connection_string = mcp_connection_string(token)
 
+    print("=" * 64)
     print()
-    print("Add this configuration to your Claude desktop tools to make the HONU MCP server available")
-    print("-------------------------------------")
+    print("  HONU MCP SERVER CONFIGURATION 🔧")
+    print()
+    print("  Add this configuration to your desktop tools")
+    print()
+    print("=" * 64)
+    print()
     print(connection_string)
-    print("-------------------------------------")
+    print()
+    print("=" * 64)
+    print()
+    print("💡 Copy and paste the JSON above into Claude Desktop's MCP settings")
+    print()
