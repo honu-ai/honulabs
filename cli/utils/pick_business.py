@@ -1,10 +1,11 @@
 from tabulate import tabulate
 
 from cli.api_client import HonulabsAPIClient
+from cli.schema import HonulabsBusinessPick
 from cli.utils.token import HonulabsToken
 
 
-def pick_business(table_style: str) -> str | None:
+def pick_business(table_style: str) -> HonulabsBusinessPick | None:
     token = HonulabsToken()
     api_client = HonulabsAPIClient(token.token)
     businesses = api_client.list_businesses()
@@ -16,6 +17,7 @@ def pick_business(table_style: str) -> str | None:
         str(num): {
             'id': biz.business_id,
             'name': biz.name,
+            'model_ref': biz.model_ref
         }
         for num, biz in enumerate(businesses, start=1)
     }
@@ -37,7 +39,10 @@ def pick_business(table_style: str) -> str | None:
             if selected_num == '':
                 return
 
-        return data[selected_num]['id']
+        return HonulabsBusinessPick(
+            id=data[selected_num]['id'],
+            model_ref=data[selected_num]['model_ref']
+        )
 
     except (KeyboardInterrupt, EOFError):
         return

@@ -202,6 +202,7 @@ def delete_project():
     business_id = pick_business(TABLE_STYLE)
     if business_id is None:
         return
+    business_id = business_id.id
 
     # Set up the job to delete the business
     job = api_client.delete_business(business_id)
@@ -219,6 +220,8 @@ def generate_business_plan():
     business_id = pick_business(TABLE_STYLE)
     if business_id is None:
         return
+    business_id = business_id.id
+
     generator = BusinessPlanGeneration(business_id, TABLE_STYLE)
     generator.run()
 
@@ -230,6 +233,7 @@ def deploy_app():
     business_id = pick_business(TABLE_STYLE)
     if business_id is None:
         return
+    business_id = business_id.id
 
     # Set up the job
     job = api_client.deploy_landing_page(business_id)
@@ -259,6 +263,7 @@ def upload_secrets():
     business_id = pick_business(TABLE_STYLE)
     if business_id is None:
         return
+    business_id = business_id.id
 
     secrets = {}
     print('Input secret names and values. Leaving any input blank will continue to the upload portion.')
@@ -301,9 +306,12 @@ def upload_secrets():
 
 @command(help_text='Check on the status of any Jobs that are currently in progress')
 def pending_jobs():
+
     business_id = pick_business(TABLE_STYLE)
     if business_id is None:
         return
+    business_id = business_id.id
+
     token = HonulabsToken()
     api_client = HonulabsAPIClient(token.token)
     pending_jobs = api_client.get_jobs(business_id, job_status=JobStatus.IN_PROGRESS)
@@ -348,6 +356,7 @@ def invite_to_repo():
     business_id = pick_business(TABLE_STYLE)
     if business_id is None:
         return
+    business_id = business_id.id
 
     invitees= []
     print('Enter usernames to invite (press Enter on empty line to finish):\n')
@@ -414,6 +423,7 @@ def new_business_idea():
     business_id = pick_business(TABLE_STYLE)
     if business_id is None:
         return
+    business_id = business_id.id
 
     idea_generator = IdeaGeneration(business_id, TABLE_STYLE)
     new_idea = idea_generator.run()
@@ -424,9 +434,14 @@ def new_business_idea():
 
 @command(help_text="Print the configuration json to connect to the Honu MCP server")
 def mcp_config_string():
+    business = pick_business(TABLE_STYLE)
+    if business is None:
+        return
+    model_ref = business.model_ref
+
     token = HonulabsToken().token
-    claude_desktop_connection_string = claude_desktop_mcp_connection_string(token)
-    cursor_connection_string = cursor_mcp_connection_string(token)
+    claude_desktop_connection_string = claude_desktop_mcp_connection_string(token, model_ref)
+    cursor_connection_string = cursor_mcp_connection_string(token, model_ref)
 
     print("=" * 64)
     print()

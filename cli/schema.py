@@ -25,6 +25,9 @@ class HonulabsBusiness(BaseModel):
     business_id: str
     model_ref: str
 
+class HonulabsBusinessPick(BaseModel):
+    id: str
+    model_ref: str
 
 class HonulabsJob(BaseModel):
     job_id: str
