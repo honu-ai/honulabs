@@ -1,12 +1,13 @@
 import json
 
 from cli.settings import Settings
+MCP_SERVER_NAME = "Honu-MCP-server"
 
 def claude_desktop_mcp_connection_string(token: str, model_ref: str):
     mcp_server_url = Settings.MCP_SERVER_URL
     config = {
         "mcpServers": {
-            "cloud-run": {
+            MCP_SERVER_NAME: {
                 "command": "npx",
                 "args": [
                     "-y",
@@ -27,7 +28,7 @@ def cursor_mcp_connection_string(token: str, model_ref: str):
     mcp_server_url = Settings.MCP_SERVER_URL
     config = {
         "mcpServers": {
-            "server-name": {
+            MCP_SERVER_NAME: {
                 "url": mcp_server_url,
                 "headers": {
                     "Authorization": f"Bearer {token}",
