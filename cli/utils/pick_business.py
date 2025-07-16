@@ -10,7 +10,7 @@ def pick_business(table_style: str) -> HonulabsBusinessPick | None:
     api_client = HonulabsAPIClient(token.token)
     businesses = api_client.list_businesses()
     if not businesses:
-        print('You have no ideas yet! Please use `create_idea` to create a new one!')
+        print('You have no projects yet! Please use `create_project` to create a new one!')
         return
 
     data = {
