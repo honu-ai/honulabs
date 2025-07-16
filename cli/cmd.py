@@ -239,9 +239,13 @@ def deploy_app():
     job = api_client.deploy_landing_page(business_id)
     print('Deployment job started successfully. Awaiting completion. Skip wait with Ctrl+C.')
     manager = JobManager(job)
+
     try:
         job = manager.await_job_completion()
         result = job.result
+        if result is None:
+            return
+
         app_links = result['app_links']
         print()
         print("🚀 Your app is ready!")

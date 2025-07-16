@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+import time
 from time import sleep
 
 from halo import Halo
@@ -27,6 +29,8 @@ class JobManager:
 
     def __init__(self, job: HonulabsJob):
         self.job = job
+        self.started_at = self.job.started_at.replace(tzinfo=timezone.utc)
+
         self.spinner = None
 
     @property
@@ -45,6 +49,11 @@ class JobManager:
                 return 'Running'
             return self.job.message
 
+    @property
+    def elapsed_time(self):
+        elapsed_seconds = (datetime.now(timezone.utc) - self.started_at).seconds
+        return time.strftime("%H:%M:%S", time.gmtime(elapsed_seconds))
+
     def await_job_completion(self, retry=True) -> HonulabsJob:
         # Loop requests to the API, give status message from the Job while it's still running
         self.spinner = Halo(text=self._message, spinner=LOADING_BAR)
@@ -56,7 +65,7 @@ class JobManager:
                 self.job = self.client.get_job(self.job.business.business_id, self.job.job_id)
             except:
                 break
-            self.spinner.text = self._message
+            self.spinner.text = f"{self._message}\t{self.elapsed_time} elapsed."
             sleep(1)
 
         # Check the finished status
