@@ -196,12 +196,39 @@ make run-dev
 
 This spins up a local containerized development environment using Docker Compose, allowing you to start coding immediately.
 
-### Development Process
+### Execute the First Sprint in Cursor
 
-1. **Open in your preferred editor** (we recommend Cursor)
-2. **Follow the sprint plan** generated during business planning
-3. **Develop and test locally** using the containerized environment
-4. **Commit and push** your changes to the repository
+1. **Attach the relevant files to your prompt**: We have prepared an additional execution guide you can attach to your prompt to make sure that the LLM has enough context when performing the tasks listed in each sprint. This will be in the project management folder in the repository.
+
+2. **Use the following prompt to execute the first sprint**:
+
+```
+You are executing Sprint 1 in a structured multisprint development workflow. Review all the task listed in @sprint-1.md and the start executing them in order making sure to follow the @execution-guide.md Once you completed the sprint report to the user and them ask them to double check all the exeptance criteria are being fulfilled. Once you completed the sprint report to the user and them ask them to double check all the expectance criteria are being fulfilled.
+```
+
+### 🔄 Execute Subsequent Sprints
+
+For sprints after the first:
+
+1. **Locate the log file** from the previous sprint at `./log/sprint-{sprint id}-logs/log.md`
+2. **Include this log file** in the context for the next sprint execution
+3. **Use the following prompt**:
+
+```
+You are executing Sprint 2 in a structured multisprint development workflow. You can find the logs from the previews sprint @log.md Review all the task listed in @sprint-2.md and then start executing them in order making sure to follow the @execution-guide.md Once you completed the sprint report to the user and them ask them to double check all the expectance criteria are being fulfilled.
+```
+
+### ✅ Verify Acceptance Criteria
+
+After each sprint:
+
+1. **Review and confirm** all acceptance criteria have been fulfilled
+2. **If criteria remain unfulfilled**, unmark them in the sprint document
+3. **Return the document to the agent** with this prompt:
+
+```
+The user has reviewed the task and have ticked the acceptance criteria that have been fulfilled. Review the file and complete any outstanding acceptance criteria. Make sure to follow the @execution-guide.md when you are completing those.
+```
 
 ### Deploying Updates
 
