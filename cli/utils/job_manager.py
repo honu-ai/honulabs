@@ -72,6 +72,9 @@ class JobManager:
             if retry:
                 self.await_job_completion(False)
             else:
-                print('Job was unable to be read and failed')
+                if self.job.job_type == "delete_business":
+                    print("Deleted!")
+                else:
+                    print('Job was unable to be read and failed')
 
         return self.job
