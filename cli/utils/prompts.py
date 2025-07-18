@@ -13,13 +13,14 @@ def prompt_with_default(prompt: str, default_to_yes: bool = True) -> bool:
         prompt_suffix = " [Y/n] "
     else:
         prompt_suffix = " [y/N] "
+    full_prompt = prompt + prompt_suffix
 
     while True:
-        response = input(prompt + prompt_suffix).lower().strip()
+        response = input(full_prompt).lower().strip()
         if response == "":
             return default_to_yes
         if response in ["y", "yes"]:
             return True
         if response in ["n", "no"]:
             return False
-        print("Please answer 'y' or 'n'.") 
+        print("Please answer 'y' or 'n'.")
