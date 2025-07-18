@@ -9,6 +9,7 @@ from cli.api_client import HonulabsAPIClient
 from cli.schema import BusinessPlanRequirementsCreate, JobStatus, BusinessPlanRequirements, BusinessPlan, \
     BusinessNamesDomains, HonulabsJob, MarketSegment
 from cli.utils.job_manager import JobManager
+from cli.utils.prompts import prompt_with_default
 from cli.utils.token import HonulabsToken
 
 
@@ -102,8 +103,7 @@ class IdeaGeneration:
                 return
 
             print(f"You are about to generate ideas for {industry.capitalize()} / {geography.capitalize()}")
-            print(f"Do you want to continue? (Y/n)")
-            if input('> ').lower() != 'y':
+            if not prompt_with_default("Do you want to continue?"):
                 return
 
         except (KeyboardInterrupt, EOFError):
