@@ -4,6 +4,9 @@ import traceback
 from typing import Callable, Dict, Optional
 
 from halo import Halo
+from prompt_toolkit import PromptSession
+from prompt_toolkit.completion import WordCompleter
+from prompt_toolkit.history import InMemoryHistory
 from tabulate import tabulate
 
 from cli.api_client import HonulabsAPIClient
@@ -17,6 +20,7 @@ from cli.utils.mcp_setup import (
     cursor_mcp_connection_string,
 )
 from cli.utils.pick_business import pick_business
+from cli.utils.prompts import prompt_with_default
 from cli.utils.token import HonulabsToken
 
 # Storage for registered commands
@@ -72,9 +76,11 @@ class HonulabsCommandPrompt(cmd.Cmd):
         print(self.intro)
         self._check_token()
         running = True
+        session = PromptSession(history=InMemoryHistory())
+        completer = WordCompleter(list(_COMMANDS.keys()) + ['help', 'exit', 'quit'], ignore_case=True)
         while running:
             try:
-                line = input(self.prompt)
+                line = session.prompt(self.prompt, completer=completer)
             except (KeyboardInterrupt, EOFError):
                 line = 'exit'
             if not line:
@@ -85,6 +91,8 @@ class HonulabsCommandPrompt(cmd.Cmd):
 
             if cmd in ("exit", "quit"):
                 running = False
+            elif cmd == '?':
+                self.do_help(args)
             elif hasattr(self, f"do_{cmd}"):
                 getattr(self, f"do_{cmd}")(args)
             else:
@@ -292,7 +300,7 @@ def upload_secrets():
     ))
     print()
     print('Please double check that all variables are correct.')
-    proceed = input('Upload these variables? [y/n]').lower().strip().startswith('y')
+    proceed = prompt_with_default('Upload these variables?')
     if not proceed:
         print('Exiting')
         return
