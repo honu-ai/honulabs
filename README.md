@@ -1,6 +1,6 @@
 # HonuLabs CLI
 
-The HonuLabs CLI is a comprehensive tool that allows you to plan and deploy your business ideas with minimal effort. HonuLabs creates a complete business infrastructure from scratch, handling all organizational heavy lifting so you can focus on building your product without worrying about setup complexities.
+The HonuLabs CLI is a comprehensive tool that allows you to plan and deploy your business projects with minimal effort. HonuLabs creates a complete business infrastructure from scratch, handling all organizational heavy lifting so you can focus on building your product without worrying about setup complexities.
 
 ## What HonuLabs Does for You
 
@@ -127,6 +127,8 @@ The system will research and generate the following components:
 - **Product pricing strategy**: Revenue model and pricing tiers
 - **MVP sprint plan**: Step-by-step development roadmap
 
+**Note**: The platform currently generates **MicroSaaS businesses** with **monthly subscription (credit-based) pricing models**. Additional pricing models will be available in future releases.
+
 During this process, you'll see progress indicators such as:
 
 ```
@@ -162,7 +164,7 @@ Once you're satisfied with your business plan, deploy a professional landing pag
 
 This command will:
 
-- Deploy a landing page at `<idea_name>.honulabs.xyz`
+- Deploy a landing page at `<business_name>.honulabs.xyz`
 - Set up Google Analytics and Tag Manager for tracking
 - Configure Supabase and Vercel infrastructure
 - Create a GitHub repository with a development template
@@ -196,7 +198,9 @@ make run-dev
 
 This spins up a local containerized development environment using Docker Compose, allowing you to start coding immediately.
 
-### Execute the First Sprint in Cursor
+### Start Coding - Your First Sprint 
+
+**Note**: Currently, only the **Cursor IDE** is supported for this workflow. **Claude Code support is coming soon.**
 
 1. **Attach the relevant files to your prompt**: We have prepared an additional execution guide you can attach to your prompt to make sure that the LLM has enough context when performing the tasks listed in each sprint. This will be in the project management folder in the repository.
 

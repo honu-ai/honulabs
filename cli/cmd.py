@@ -187,7 +187,7 @@ def list_projects():
             return
 
     print(tabulate(
-        ({'id': biz.business_id, 'name': biz.name} for biz in businesses),
+        ({'ID': biz.business_id, 'Project Name': biz.name} for biz in businesses),
         headers='keys',
         tablefmt=TABLE_STYLE,
     ))
@@ -195,6 +195,12 @@ def list_projects():
 
 @command(help_text='Create new Project')
 def create_project(*name: str):
+    if not name:
+        print('Error: Project name is required.')
+        print('Usage: create_project <project_name>')
+        print('Example: create_project My Cool App')
+        return
+    
     token = HonulabsToken()
     api_client = HonulabsAPIClient(token.token)
     name = ' '.join(name)
@@ -371,9 +377,9 @@ def invite_to_repo():
     business_id = business_id.id
 
     invitees= []
-    print('Enter usernames to invite (press Enter on empty line to finish):\n')
+    print('Enter GitHub usernames to invite (press Enter on empty line to finish):\n')
     while True:
-        invitee = input('username: ').strip()
+        invitee = input('GitHub username: ').strip()
         if invitee == '':
             break
         invitees.append(Collaborator(username=invitee))
