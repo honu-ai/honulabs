@@ -23,20 +23,20 @@ def pick_business(table_style: str) -> HonulabsBusinessPick | None:
     }
 
     print(tabulate(
-        ({'Number': num, 'Name': data[num]['name']} for num in sorted(data)),
+        ({'Number': num, 'Project Name': data[num]['name']} for num in sorted(data)),
         headers='keys',
         tablefmt=table_style,
     ))
     try:
-        print('Please select the number of the idea to interact with, or press ENTER to cancel.')
+        print('Please select the number of the project to interact with, or press ESC to cancel.')
         selected_num = input('> ').strip()
-        if selected_num == '':
+        if selected_num == '' or selected_num.lower() == 'esc' or selected_num == '\x1b':
             return
 
         while selected_num not in data:
-            print('That number is not a valid choice, please select a valid choice or press ENTER to cancel.')
+            print('That number is not a valid choice, please select a valid choice or press ESC to cancel.')
             selected_num = input('> ').strip()
-            if selected_num == '':
+            if selected_num == '' or selected_num.lower() == 'esc' or selected_num == '\x1b':
                 return
 
         return HonulabsBusinessPick(
