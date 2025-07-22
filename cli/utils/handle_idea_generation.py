@@ -27,11 +27,16 @@ class IdeaGeneration:
         if not segment:
             return
 
-        new_idea = self._idea_generation(segment)
-        if not new_idea:
-            return
-
-        return new_idea
+        while True:
+            new_idea = self._idea_generation(segment)
+            if not new_idea:
+                return
+            elif new_idea == 'restart':
+                # User pressed ENTER to generate new ideas - continue the loop
+                continue
+            else:
+                # User selected a specific idea
+                return new_idea
 
     def _idea_generation(self, segment: dict):
         # Set up the job
@@ -73,15 +78,23 @@ class IdeaGeneration:
             )
         )
         try:
-            print('Please select one of the ideas, or just press ENTER to start again.')
+            print('Please select one of the ideas, press ENTER to generate new ideas, or type "q" to cancel.')
             selected_num = input('> ').strip()
             if selected_num == '':
+                # ENTER pressed - restart idea generation with same segment
+                return 'restart'
+            elif selected_num.lower() in ('q', 'quit', 'cancel'):
+                # User wants to cancel and return to menu
                 return
 
             while selected_num not in categories:
-                print('That number is not a valid choice, please select a valid choice or press ENTER to cancel.')
+                print('That number is not a valid choice, please select a valid choice, press ENTER to generate new ideas, or type "q" to cancel.')
                 selected_num = input('> ').strip()
                 if selected_num == '':
+                    # ENTER pressed - restart idea generation with same segment
+                    return 'restart'
+                elif selected_num.lower() in ('q', 'quit', 'cancel'):
+                    # User wants to cancel and return to menu
                     return
 
             return categories[selected_num]
