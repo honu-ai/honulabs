@@ -445,6 +445,10 @@ def new_business_idea():
 
     idea_generator = IdeaGeneration(business_id, TABLE_STYLE)
     new_idea = idea_generator.run()
+    
+    # If user cancelled idea generation, don't proceed to business plan
+    if new_idea is None:
+        return
 
     generator = BusinessPlanGeneration(business_id, TABLE_STYLE)
     generator.run(new_idea)
