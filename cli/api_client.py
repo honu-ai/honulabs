@@ -144,3 +144,11 @@ class HonulabsAPIClient:
         if response.status_code != status.HTTP_202_ACCEPTED:
             raise Exception(f'Could not start Idea Generation process: {response.text}: {response.status_code}')
         return HonulabsJob(**response.json())
+
+    def toggle_product_readiness(self, business_id: str):
+        response = self.client.post(
+            f'/v1/businesses/{business_id}/jobs/toggle_product_readiness',
+        )
+        if response.status_code != status.HTTP_202_ACCEPTED:
+            raise Exception(f'Could not Toggle product readiness: {response.text}: {response.status_code}')
+        return HonulabsJob(**response.json())

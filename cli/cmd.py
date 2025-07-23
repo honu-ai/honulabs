@@ -487,3 +487,28 @@ def mcp_config_string():
     print()
     print("💡 Copy and paste the appropriate JSON above into your tool's MCP settings")
     print()
+
+
+@command(help_text="Toggle readiness switch")
+def toggle_readiness_switch():
+    token = HonulabsToken()
+    api_client = HonulabsAPIClient(token.token)
+    business_id = pick_business(TABLE_STYLE)
+    if business_id is None:
+        return
+    business_id = business_id.id
+
+    # Set up the job
+    job = api_client.toggle_product_readiness(business_id)
+
+    print('Switch toggled, deployment started successfully. Awaiting completion. Skip wait with Ctrl+C.')
+    manager = JobManager(job)
+    try:
+        result = manager.await_job_completion()
+        print()
+        print("App has been deployed")
+        print()
+
+    except (KeyboardInterrupt, EOFError):
+        manager.spinner.stop()
+        print(f'Skipping wait for job completion. Job will continue running in the background, with id {job.job_id}')
