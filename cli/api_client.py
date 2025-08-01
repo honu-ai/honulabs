@@ -152,3 +152,11 @@ class HonulabsAPIClient:
         if response.status_code != status.HTTP_202_ACCEPTED:
             raise Exception(f'Could not Toggle product readiness: {response.text}: {response.status_code}')
         return HonulabsJob(**response.json())
+
+    def approve_trello_sprint_plan(self, business_id: str):
+        response = self.client.post(
+            f'/v1/businesses/{business_id}/jobs/confirm_trello_sprint_ready',
+        )
+        if response.status_code != status.HTTP_202_ACCEPTED:
+            raise Exception(f'Could confirm trello sprint: {response.text}: {response.status_code}')
+        return HonulabsJob(**response.json())
