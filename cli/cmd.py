@@ -512,3 +512,29 @@ def toggle_readiness_switch():
     except (KeyboardInterrupt, EOFError):
         manager.spinner.stop()
         print(f'Skipping wait for job completion. Job will continue running in the background, with id {job.job_id}')
+
+
+@command(help_text='Approve the proposed trello sprint plan')
+def approve_trello_sprint_plan():
+    token = HonulabsToken()
+    api_client = HonulabsAPIClient(token.token)
+    business_id = pick_business(TABLE_STYLE)
+    if business_id is None:
+        return
+    business_id = business_id.id
+
+    # Set up the job
+    job = api_client.approve_trello_sprint_plan(business_id)
+    print('Approving trello sprint plan. Awaiting completion. Skip wait with Ctrl+C.')
+    manager = JobManager(job)
+
+    try:
+        job = manager.await_job_completion()
+        print()
+        print(f"Done")
+        print()
+
+    except (KeyboardInterrupt, EOFError):
+        manager.spinner.stop()
+        print(f'Skipping wait for job completion. Job will continue running in the background, with id {job.job_id}')
+
