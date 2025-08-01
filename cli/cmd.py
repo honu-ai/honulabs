@@ -538,3 +538,46 @@ def approve_trello_sprint_plan():
         manager.spinner.stop()
         print(f'Skipping wait for job completion. Job will continue running in the background, with id {job.job_id}')
 
+
+@command(help_text='Invite a collaborator to the project trello board')
+def invite_trello_collaborator():
+    token = HonulabsToken()
+    api_client = HonulabsAPIClient(token.token)
+    business_id = pick_business(TABLE_STYLE)
+    if business_id is None:
+        return
+    business_id = business_id.id
+
+    invitees= []
+    print('Enter emails to invite collaborators to your trello board (press Enter on empty line to finish):\n')
+    while True:
+        invitee = input('Email: ').strip()
+        if invitee == '':
+            break
+        invitees.append(invitee)
+        print(f'✓ Added "{invitee}"\n')
+        print()
+
+    if not invitees:
+        print('Not inviting anyone!')
+        return
+
+    # Confirmation
+    print(f'\n📋 Ready to invite {len(invitees)} user(s):')
+    for i, collab in enumerate(invitees, 1):
+        print(f'   {i}. {collab}')
+
+    # Set up the job
+    job = api_client.invite_trello_collaborator(business_id, invitees)
+    print('Inviting collaborators. Awaiting completion. Skip wait with Ctrl+C.')
+    manager = JobManager(job)
+
+    try:
+        job = manager.await_job_completion()
+        print()
+        print(f"Done")
+        print()
+
+    except (KeyboardInterrupt, EOFError):
+        manager.spinner.stop()
+        print(f'Skipping wait for job completion. Job will continue running in the background, with id {job.job_id}')

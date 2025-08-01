@@ -160,3 +160,20 @@ class HonulabsAPIClient:
         if response.status_code != status.HTTP_202_ACCEPTED:
             raise Exception(f'Could confirm trello sprint: {response.text}: {response.status_code}')
         return HonulabsJob(**response.json())
+
+    def invite_trello_collaborator(self, business_id: str, collaborator_emails: list[str]):
+        collabs = dict(collaborators=[
+                dict(
+                    email=email,
+                    type="normal"
+                )
+                for email in collaborator_emails
+            ]
+        )
+        response = self.client.post(
+            f'/v1/businesses/{business_id}/jobs/add_users_to_trello_board',
+            json=collabs
+        )
+        if response.status_code != status.HTTP_202_ACCEPTED:
+            raise Exception(f'Could add collaboratos to board: {response.text}: {response.status_code}')
+        return HonulabsJob(**response.json())
