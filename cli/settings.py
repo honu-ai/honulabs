@@ -2,6 +2,7 @@ from pydantic_settings import BaseSettings
 
 
 class _Settings(BaseSettings):
+    # Prod
     API_URL: str = 'https://honulabs-api.honu.ai'
     AUTH_URL: str = 'https://auth.honu.ai'
     HAP_URL: str = 'https://happi.honu.ai'
