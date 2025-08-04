@@ -17,6 +17,7 @@ pydantic-settings = "^2.10.1"
 fastapi = "^0.115.13"
 tabulate = "^0.9.0"
 prompt-toolkit = "^3.0.51"
+mypy = "^1.17.0"
 
 [build-system]
 requires = ["poetry-core"]
