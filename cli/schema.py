@@ -32,7 +32,8 @@ class HonulabsBusinessPick(BaseModel):
 class HonulabsJob(BaseModel):
     job_id: str
     job_type: str
-    business: HonulabsBusiness
+    organisation: HonulabsOrganisation | None = None
+    business: HonulabsBusiness | None = None
     status: JobStatus
     message: str | None = None
     cost: float | None = None
