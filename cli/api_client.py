@@ -126,18 +126,18 @@ class HonulabsAPIClient:
             raise Exception(f'Could not invite user: {response.text}')
         return HonulabsJob(**response.json())
 
-    def generate_market_segment(self, business_id: str, geography: str, segment: str):
+    def generate_market_segment(self, geography: str, segment: str):
         response = self.client.post(
-            f'/v1/businesses/{business_id}/jobs/industry_idea_segmentation',
+            f'/v1/organisations/jobs/industry_idea_segmentation',
             json=dict(geography=geography, industry=segment),
         )
         if response.status_code != status.HTTP_202_ACCEPTED:
             raise Exception(f'Could not start Idea Generation process: {response.text}: {response.status_code}')
         return HonulabsJob(**response.json())
 
-    def idea_generation(self, business_id: str, geography: str, market_segment: MarketSegment):
+    def idea_generation(self, geography: str, market_segment: MarketSegment):
         response = self.client.post(
-            f'/v1/businesses/{business_id}/jobs/idea_generation',
+            f'/v1/organisations/jobs/idea_generation',
             json=market_segment.model_dump(),
             params=dict(geography=geography)
         )
