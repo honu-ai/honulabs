@@ -437,20 +437,20 @@ def login():
 @command(help_text="generate a new idea for a business")
 def new_business_idea():
     token = HonulabsToken()
-    HonulabsAPIClient(token.token)
-    business_id = pick_business(TABLE_STYLE)
-    if business_id is None:
-        return
-    business_id = business_id.id
-
-    idea_generator = IdeaGeneration(business_id, TABLE_STYLE)
+    client = HonulabsAPIClient(token.token)
+    idea_generator = IdeaGeneration(TABLE_STYLE)
     new_idea = idea_generator.run()
     
     # If user cancelled idea generation, don't proceed to business plan
     if new_idea is None:
         return
 
-    generator = BusinessPlanGeneration(business_id, TABLE_STYLE)
+    # Create the new project for this idea
+    idea_name = new_idea.get('saas_venture_title', datetime.now().isoformat())
+    with Halo(text=f'Creating Project: {idea_name}', spinner='dots'):
+        business = client.create_business(f'Idea: {idea_name}')
+
+    generator = BusinessPlanGeneration(business.business_id, TABLE_STYLE)
     generator.run(new_idea)
 
 

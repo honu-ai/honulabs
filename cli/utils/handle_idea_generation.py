@@ -16,10 +16,9 @@ from cli.utils.token import HonulabsToken
 class IdeaGeneration:
     REQUIREMENTS_JOB_TYPE = 'business_plan_requirements'
 
-    def __init__(self, business_id: str, table_style: str):
+    def __init__(self, table_style: str):
         self.token = HonulabsToken()
         self.api_client = HonulabsAPIClient(self.token.token)
-        self.business_id = business_id
         self.table_style = table_style
 
     def run(self):
@@ -41,7 +40,6 @@ class IdeaGeneration:
     def _idea_generation(self, segment: dict):
         # Set up the job
         job = self.api_client.idea_generation(
-            self.business_id,
             segment['geography'],
             MarketSegment(**segment['segment'])
         )
@@ -125,7 +123,6 @@ class IdeaGeneration:
 
         # Set up the job
         job = self.api_client.generate_market_segment(
-            self.business_id,
             geography,
             industry,
         )
